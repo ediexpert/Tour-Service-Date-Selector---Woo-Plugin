@@ -66,6 +66,8 @@ $wrapper_style = ( $is_variable && Helper::SERVICE_OPEN_DATED === $service_type 
 			aria-label="<?php esc_attr_e( 'Date picker calendar', 'tour-service-date-selector' ); ?>"
 		></div>
 
+		<p class="tsds-selected-date" id="tsds-selected-date" aria-live="polite" style="display:none;"></p>
+
 		<input
 			type="hidden"
 			id="tsds-booking-date"

@@ -100,17 +100,24 @@ class Order_Meta {
 		$date = $item->get_meta( self::ORDER_DATE_KEY );
 		$time = $item->get_meta( self::ORDER_TIME_KEY );
 
+		$display_date = $date
+			? Helper::format_booking_date_for_display(
+				(string) $date,
+				Helper::get_date_format()
+			)
+			: '';
+
 		if ( ! $date && ! $time ) {
 			return;
 		}
 
 		echo '<div class="tsds-order-meta">';
 
-		if ( $date ) {
+		if ( $display_date ) {
 			printf(
 				'<p class="tsds-order-meta__row"><strong>%s:</strong> %s</p>',
 				esc_html__( 'Booking Date', 'tour-service-date-selector' ),
-				esc_html( $date )
+				esc_html( $display_date )
 			);
 		}
 
@@ -136,13 +143,20 @@ class Order_Meta {
 		$date = $item->get_meta( self::ORDER_DATE_KEY );
 		$time = $item->get_meta( self::ORDER_TIME_KEY );
 
-		if ( $date ) {
+		$display_date = $date
+			? Helper::format_booking_date_for_display(
+				(string) $date,
+				Helper::get_date_format()
+			)
+			: '';
+
+		if ( $display_date ) {
 			$meta          = new \stdClass();
 			$meta->key     = self::ORDER_DATE_KEY;
 			$meta->label   = __( 'Booking Date', 'tour-service-date-selector' );
-			$meta->value   = esc_html( $date );
+			$meta->value   = esc_html( $display_date );
 			$meta->display_key   = __( 'Booking Date', 'tour-service-date-selector' );
-			$meta->display_value = esc_html( $date );
+			$meta->display_value = esc_html( $display_date );
 			$formatted_meta[]    = $meta;
 		}
 

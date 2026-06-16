@@ -26,6 +26,7 @@
 	const state = {
 		calendar: null,      // Flatpickr instance
 		currentServiceType: tsdsData.serviceType || 'open_dated',
+		currentDateFormat: tsdsData.displayDateFormat || 'F j, Y',
 		currentSchedule:    tsdsData.schedule     || [],
 		currentDisabled:    tsdsData.disabledWeekdays || [],
 		initialized: false,
@@ -101,6 +102,36 @@
 		} );
 	}
 
+	/**
+	 * Update selected date preview text.
+	 *
+	 * @param {Date|null} dateObj
+	 * @param {string}    dateStr
+	 */
+	function updateSelectedDatePreview( dateObj, dateStr ) {
+		const preview = document.getElementById( 'tsds-selected-date' );
+		if ( ! preview ) {
+			return;
+		}
+
+		if ( ! dateObj ) {
+			preview.textContent = '';
+			preview.style.display = 'none';
+			return;
+		}
+
+		let formatted = dateStr || '';
+
+		if ( state.calendar && typeof state.calendar.formatDate === 'function' ) {
+			formatted = state.calendar.formatDate( dateObj, state.currentDateFormat );
+		} else if ( typeof flatpickr !== 'undefined' && typeof flatpickr.formatDate === 'function' ) {
+			formatted = flatpickr.formatDate( dateObj, state.currentDateFormat );
+		}
+
+		preview.textContent = ( tsdsData.i18n.selectedDate || 'Selected Date:' ) + ' ' + formatted;
+		preview.style.display = 'block';
+	}
+
 	// ───────────────────────────────────────────────
 	// Calendar init / destroy
 	// ───────────────────────────────────────────────
@@ -134,6 +165,8 @@
 			dateInput.value = '';
 		}
 
+		updateSelectedDatePreview( null, '' );
+
 		state.calendar = flatpickr( container, {
 			inline: true,
 			minDate: 'today',
@@ -148,6 +181,7 @@
 				if ( dateInput ) {
 					dateInput.value = dateStr;
 				}
+				updateSelectedDatePreview( selectedDates[0] || null, dateStr );
 				clearError( 'date' );
 
 				if ( state.currentServiceType === 'date_time' ) {
@@ -178,6 +212,7 @@
 		if ( dateInput ) {
 			dateInput.value = '';
 		}
+		updateSelectedDatePreview( null, '' );
 		destroyCalendar();
 	}
 
@@ -196,14 +231,15 @@
 	/**
 	 * Apply a service type — show/hide fields and (re)init calendar.
 	 *
-	 * @param {string} serviceType  'open_dated' | 'date_only' | 'date_time'
-	 * @param {Array}  schedule     TSDS schedule array.
-	 * @param {int[]}  disabledWeekdays
+	 * @param {string} serviceType      'open_dated' | 'date_only' | 'date_time'
+	 * @param {Array}  schedule         TSDS schedule array.
+	 * @param {int[]}  disabledWeekdays Disabled weekday indices.
 	 */
 	function applyServiceType( serviceType, schedule, disabledWeekdays ) {
 		state.currentServiceType  = serviceType;
 		state.currentSchedule     = schedule;
 		state.currentDisabled     = disabledWeekdays;
+		state.currentDateFormat   = tsdsData.displayDateFormat || 'F j, Y';
 
 		const $wrapper = $( '.tsds-booking-wrapper' );
 

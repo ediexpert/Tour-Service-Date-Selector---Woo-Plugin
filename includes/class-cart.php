@@ -131,9 +131,14 @@ class Cart {
 	 */
 	public function get_item_data( array $item_data, array $cart_item ): array {
 		if ( ! empty( $cart_item[ Helper::CART_DATE_KEY ] ) ) {
+			$display_date = Helper::format_booking_date_for_display(
+				(string) $cart_item[ Helper::CART_DATE_KEY ],
+				Helper::get_date_format()
+			);
+
 			$item_data[] = array(
 				'name'  => __( 'Date', 'tour-service-date-selector' ),
-				'value' => esc_html( $cart_item[ Helper::CART_DATE_KEY ] ),
+				'value' => esc_html( $display_date ),
 			);
 		}
 

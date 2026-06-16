@@ -52,7 +52,6 @@ class Variation_Fields {
 		\WP_Post $variation
 	): void {
 		$variation_id = $variation->ID;
-		$parent_id    = $variation->post_parent;
 		$service_type = get_post_meta( $variation_id, Helper::META_SERVICE_TYPE, true ) ?: '';
 		$schedule_raw = get_post_meta( $variation_id, Helper::META_SCHEDULE, true );
 		$schedule     = Helper::normalize_schedule( is_array( $schedule_raw ) ? $schedule_raw : array() );

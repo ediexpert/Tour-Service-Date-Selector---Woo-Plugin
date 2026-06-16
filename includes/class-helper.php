@@ -32,6 +32,8 @@ class Helper {
 	public const META_SCHEDULE       = '_tsds_weekly_schedule';
 	public const CART_DATE_KEY       = '_tsds_booking_date';
 	public const CART_TIME_KEY       = '_tsds_booking_time';
+	public const OPTION_DATE_FORMAT  = 'tsds_date_format';
+	public const DEFAULT_DATE_FORMAT = 'F j, Y';
 
 	/**
 	 * Ordered weekday slugs.
@@ -72,6 +74,70 @@ class Helper {
 			self::SERVICE_DATE_ONLY  => __( 'Just date, no time', 'tour-service-date-selector' ),
 			self::SERVICE_DATE_TIME  => __( 'Date and time', 'tour-service-date-selector' ),
 		);
+	}
+
+	/**
+	 * Return supported booking date format options.
+	 *
+	 * @return array<string,string>
+	 */
+	public static function date_format_labels(): array {
+		return array(
+			'F j, Y' => __( 'June 16, 2026 (F j, Y)', 'tour-service-date-selector' ),
+			'j F Y'  => __( '16 June 2026 (j F Y)', 'tour-service-date-selector' ),
+			'Y-m-d'  => __( '2026-06-16 (Y-m-d)', 'tour-service-date-selector' ),
+			'd-m-Y'  => __( '16-06-2026 (d-m-Y)', 'tour-service-date-selector' ),
+			'd/m/Y'  => __( '16/06/2026 (d/m/Y)', 'tour-service-date-selector' ),
+			'm/d/Y'  => __( '06/16/2026 (m/d/Y)', 'tour-service-date-selector' ),
+		);
+	}
+
+	/**
+	 * Sanitize a date format key against the allowlist.
+	 *
+	 * @param string $format Raw format.
+	 * @return string
+	 */
+	public static function sanitize_date_format( string $format ): string {
+		$clean   = sanitize_text_field( $format );
+		$formats = array_keys( self::date_format_labels() );
+
+		if ( in_array( $clean, $formats, true ) ) {
+			return $clean;
+		}
+
+		return self::DEFAULT_DATE_FORMAT;
+	}
+
+	/**
+	 * Get booking date display format from central plugin settings.
+	 *
+	 * @return string
+	 */
+	public static function get_date_format(): string {
+		$format = get_option( self::OPTION_DATE_FORMAT, self::DEFAULT_DATE_FORMAT );
+		return self::sanitize_date_format( (string) $format );
+	}
+
+	/**
+	 * Format a stored Y-m-d booking date for display.
+	 *
+	 * @param string $date   Date in Y-m-d.
+	 * @param string $format Display format.
+	 * @return string
+	 */
+	public static function format_booking_date_for_display( string $date, string $format ): string {
+		$clean_date = self::sanitize_date( $date );
+		if ( '' === $clean_date ) {
+			return $date;
+		}
+
+		$timestamp = strtotime( $clean_date . ' 00:00:00' );
+		if ( false === $timestamp ) {
+			return $clean_date;
+		}
+
+		return wp_date( self::sanitize_date_format( $format ), $timestamp );
 	}
 
 	/**

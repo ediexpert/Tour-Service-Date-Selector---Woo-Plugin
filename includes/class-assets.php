@@ -102,6 +102,7 @@ class Assets {
 			'productId'       => $product_id,
 			'productType'     => $product->get_type(),
 			'serviceType'     => $service_type,
+			'displayDateFormat' => Helper::get_date_format(),
 			'schedule'        => Helper::schedule_for_js( $schedule ),
 			'disabledWeekdays'=> Helper::disabled_weekday_indices( $schedule ),
 			'nonce'           => wp_create_nonce( 'tsds_add_to_cart' ),
@@ -112,6 +113,7 @@ class Assets {
 				'invalidTime'      => __( 'The selected time is not available for this date.', 'tour-service-date-selector' ),
 				'dateLabel'        => __( 'Select Date', 'tour-service-date-selector' ),
 				'timeLabel'        => __( 'Select Time', 'tour-service-date-selector' ),
+				'selectedDate'     => __( 'Selected Date:', 'tour-service-date-selector' ),
 			),
 			// Variations data will be populated inline for variable products.
 			'variations'      => array(),

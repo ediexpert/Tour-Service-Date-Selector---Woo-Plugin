@@ -50,6 +50,7 @@ final class Plugin {
 
 		// Admin.
 		if ( is_admin() ) {
+			( new Admin\Settings() )->register();
 			( new Admin\Product_Tab() )->register();
 			( new Admin\Product_Fields() )->register();
 			( new Admin\Product_Save() )->register();
