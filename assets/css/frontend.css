@@ -50,6 +50,7 @@
 
 .tsds-booking-wrapper .tsds-calendar-container {
 	display: inline-block;
+	width: 100%;
 	max-width: 100%;
 }
 
@@ -61,9 +62,19 @@
 	box-shadow: none;
 	border: 1px solid var(--tsds-border, currentColor);
 	border-radius: 4px;
+	width: 100%;
 	max-width: 100%;
 	background: var(--tsds-calendar-bg, var(--tsds-surface, transparent));
 	color: inherit;
+	overflow: hidden;
+}
+
+.tsds-booking-wrapper .flatpickr-calendar.inline .flatpickr-rContainer,
+.tsds-booking-wrapper .flatpickr-calendar.inline .flatpickr-days,
+.tsds-booking-wrapper .flatpickr-calendar.inline .dayContainer,
+.tsds-booking-wrapper .flatpickr-calendar.inline .flatpickr-weekdays {
+	width: 100%;
+	max-width: 100%;
 }
 
 .tsds-booking-wrapper .flatpickr-months,
@@ -150,11 +161,44 @@
 /* ─── Responsive ─────────────────────────────────────────────── */
 
 @media ( max-width: 480px ) {
+	.tsds-booking-wrapper {
+		padding: 1em;
+	}
+
 	.tsds-booking-wrapper .flatpickr-calendar.inline {
 		width: 100% !important;
 	}
 
+	.tsds-booking-wrapper .flatpickr-calendar.inline .flatpickr-months {
+		padding: 0 0.25em;
+	}
+
+	.tsds-booking-wrapper .flatpickr-calendar.inline .flatpickr-current-month {
+		font-size: 0.95em;
+	}
+
+	.tsds-booking-wrapper .flatpickr-calendar.inline .flatpickr-weekday,
+	.tsds-booking-wrapper .flatpickr-calendar.inline .flatpickr-day {
+		height: 2.2em;
+		line-height: 2.2em;
+		max-width: 14.2857%;
+		font-size: 0.92em;
+	}
+
 	.tsds-booking-wrapper .tsds-time-select {
 		max-width: 100%;
+	}
+}
+
+@media ( max-width: 360px ) {
+	.tsds-booking-wrapper .flatpickr-calendar.inline .flatpickr-current-month {
+		font-size: 0.9em;
+	}
+
+	.tsds-booking-wrapper .flatpickr-calendar.inline .flatpickr-weekday,
+	.tsds-booking-wrapper .flatpickr-calendar.inline .flatpickr-day {
+		height: 2em;
+		line-height: 2em;
+		font-size: 0.85em;
 	}
 }
