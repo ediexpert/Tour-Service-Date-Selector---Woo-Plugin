@@ -24,7 +24,7 @@
 	 * Internal state.
 	 */
 	const state = {
-		calendar: null,      // Flatpickr instance
+		calendars: [],       // Flatpickr instances
 		currentServiceType: tsdsData.serviceType || 'open_dated',
 		currentDateFormat: tsdsData.displayDateFormat || 'F j, Y',
 		currentSchedule:    tsdsData.schedule     || [],
@@ -87,18 +87,18 @@
 	}
 
 	/**
-	 * Populate the time dropdown for a given date.
+	 * Populate the time dropdown for a given date across all forms.
 	 *
 	 * @param {Date|null} date
 	 */
 	function populateTimeSelect( date ) {
-		const $select = $( '#tsds-booking-time' );
-		if ( ! $select.length ) {
+		const $selects = $( '.tsds-time-select' );
+		if ( ! $selects.length ) {
 			return;
 		}
 
-		$select.empty().append(
-			$( '<option>' ).val( '' ).text( tsdsData.i18n.selectTime )
+		$selects.empty().append(
+			$( '<option>' ).val( '' ).text( tsdsData.i18n.selectTime || '— Select time —' )
 		);
 
 		if ( ! date ) {
@@ -112,38 +112,45 @@
 
 		const slots = buildTimeSlots( daySchedule.start, daySchedule.end );
 		slots.forEach( function ( slot ) {
-			$select.append( $( '<option>' ).val( slot ).text( slot ) );
+			$selects.append( $( '<option>' ).val( slot ).text( slot ) );
 		} );
 	}
 
 	/**
-	 * Update selected date preview text.
+	 * Update selected date preview text across all layouts.
 	 *
 	 * @param {Date|null} dateObj
 	 * @param {string}    dateStr
 	 */
 	function updateSelectedDatePreview( dateObj, dateStr ) {
-		const preview = document.getElementById( 'tsds-selected-date' );
-		if ( ! preview ) {
+		const $previews = $( '.tsds-selected-date' );
+		if ( ! $previews.length ) {
 			return;
 		}
 
 		if ( ! dateObj ) {
-			preview.textContent = '';
-			preview.style.display = 'none';
+			$previews.text( '' ).hide();
 			return;
 		}
 
 		let formatted = dateStr || '';
 
-		if ( state.calendar && typeof state.calendar.formatDate === 'function' ) {
-			formatted = state.calendar.formatDate( dateObj, state.currentDateFormat );
-		} else if ( typeof flatpickr !== 'undefined' && typeof flatpickr.formatDate === 'function' ) {
-			formatted = flatpickr.formatDate( dateObj, state.currentDateFormat );
+		let formatFn = null;
+		if ( state.calendars && state.calendars.length ) {
+			const activeFp = state.calendars.find( function ( fp ) { return fp && typeof fp.formatDate === 'function'; } );
+			if ( activeFp ) {
+				formatFn = activeFp.formatDate.bind( activeFp );
+			}
+		}
+		if ( ! formatFn && typeof flatpickr !== 'undefined' && typeof flatpickr.formatDate === 'function' ) {
+			formatFn = flatpickr.formatDate;
 		}
 
-		preview.textContent = ( tsdsData.i18n.selectedDate || 'Selected Date:' ) + ' ' + formatted;
-		preview.style.display = 'block';
+		if ( formatFn ) {
+			formatted = formatFn( dateObj, state.currentDateFormat );
+		}
+
+		$previews.text( ( tsdsData.i18n.selectedDate || 'Selected Date:' ) + ' ' + formatted ).show();
 	}
 
 	// ───────────────────────────────────────────────
@@ -151,61 +158,63 @@
 	// ───────────────────────────────────────────────
 
 	/**
-	 * Destroy existing Flatpickr instance if present.
+	 * Destroy existing Flatpickr instances if present.
 	 */
-	function destroyCalendar() {
-		if ( state.calendar ) {
-			state.calendar.destroy();
-			state.calendar = null;
+	function destroyCalendars() {
+		if ( state.calendars && state.calendars.length ) {
+			state.calendars.forEach( function ( fp ) {
+				if ( fp && typeof fp.destroy === 'function' ) {
+					fp.destroy();
+				}
+			} );
 		}
+		state.calendars = [];
 	}
 
 	/**
-	 * Initialise (or re-initialise) Flatpickr popup calendar.
+	 * Initialise Flatpickr on a single date input.
 	 *
-	 * @param {int[]} disabledWeekdays Array of disabled weekday indices (0–6).
+	 * @param {HTMLElement} calendarInput
+	 * @param {int[]}       disabledWeekdays
 	 */
-	function initCalendar( disabledWeekdays ) {
-		destroyCalendar();
-
-		const calendarInput = document.getElementById( 'tsds-calendar' );
-		if ( ! calendarInput ) {
+	function initSingleCalendar( calendarInput, disabledWeekdays ) {
+		if ( ! calendarInput || calendarInput._flatpickr ) {
 			return;
 		}
 
-		const calendarMountPoint = calendarInput.closest( '.tsds-date-field-group' ) || calendarInput.parentElement;
-
-		// Reset hidden date input.
-		const dateInput = document.getElementById( 'tsds-booking-date' );
-		if ( dateInput ) {
-			dateInput.value = '';
-		}
-
-		calendarInput.value = '';
 		calendarInput.setAttribute( 'placeholder', getDatePlaceholder( state.currentServiceType ) );
 
-		updateSelectedDatePreview( null, '' );
-
-		state.calendar = flatpickr( calendarInput, {
+		const fpInstance = flatpickr( calendarInput, {
 			minDate: 'today',
-			dateFormat: 'Y-m-d',
-			altInput: true,
-			altFormat: state.currentDateFormat,
+			// Display the human-readable format directly in the visible input.
+			// No altInput — one input, one source of truth, no hidden/cloned confusion.
+			dateFormat: state.currentDateFormat,
 			allowInput: false,
 			clickOpens: true,
-			appendTo: calendarMountPoint,
-			positionElement: calendarInput,
-			// Disable weekdays not in the schedule.
+			// Append to body so the calendar floats above any theme drawer/modal
+			// (CommerceKit StickyAddToCart uses overflow:hidden on its container).
+			appendTo: document.body,
 			disable: [
 				function ( date ) {
 					return disabledWeekdays.indexOf( date.getDay() ) !== -1;
 				},
 			],
 			onChange: function ( selectedDates, dateStr ) {
-				if ( dateInput ) {
-					dateInput.value = dateStr;
-				}
-				updateSelectedDatePreview( selectedDates[0] || null, dateStr );
+				// Derive Y-m-d for cart/server — dateStr is in display format.
+				const ymd = selectedDates[0]
+					? flatpickr.formatDate( selectedDates[0], 'Y-m-d' )
+					: '';
+
+				// Update all hidden booking inputs with the machine-readable value.
+				$( 'input[name="tsds_booking_date"]' ).val( ymd );
+
+				// Synchronize selected date to all other Flatpickr instances on the page.
+				$( '.tsds-date-input' ).each( function () {
+					if ( this._flatpickr && this._flatpickr !== fpInstance && typeof this._flatpickr.setDate === 'function' ) {
+						this._flatpickr.setDate( selectedDates[0] || null, false );
+					}
+				} );
+
 				clearError( 'date' );
 
 				if ( state.currentServiceType === 'date_time' ) {
@@ -215,26 +224,47 @@
 				// Dispatch custom event for extensibility.
 				const event = new CustomEvent( 'tsdsDateChanged', {
 					bubbles: true,
-					detail: { date: dateStr, dateObject: selectedDates[0] },
+					detail: { date: ymd, dateObject: selectedDates[0] },
 				} );
 				document.dispatchEvent( event );
 			},
 			onReady: function ( _selectedDates, _dateStr, instance ) {
-				const targetInput = instance.altInput || instance.input;
-				if ( ! targetInput ) {
-					return;
+				// Tag the calendar so our CSS applies even when it's on <body>.
+				if ( instance.calendarContainer ) {
+					instance.calendarContainer.classList.add( 'tsds-calendar' );
 				}
-
-				targetInput.setAttribute( 'readonly', 'readonly' );
-				targetInput.setAttribute( 'placeholder', getDatePlaceholder( state.currentServiceType ) );
-				targetInput.addEventListener( 'click', function () {
-					instance.open();
-				} );
-				targetInput.addEventListener( 'focus', function () {
-					instance.open();
-				} );
 			},
 		} );
+
+		if ( fpInstance ) {
+			state.calendars.push( fpInstance );
+
+			// If another input has already set a date, bind it to this instance too
+			const currentVal = $( 'input[name="tsds_booking_date"]' ).val();
+			if ( currentVal ) {
+				const parts = currentVal.split( '-' );
+				if ( parts.length === 3 ) {
+					const dateObj = new Date( parseInt( parts[0], 10 ), parseInt( parts[1], 10 ) - 1, parseInt( parts[2], 10 ) );
+					fpInstance.setDate( dateObj, false );
+				}
+			}
+		}
+	}
+
+	/**
+	 * Initialise (or re-initialise) Flatpickr popups.
+	 *
+	 * @param {int[]} disabledWeekdays Array of disabled weekday indices (0–6).
+	 */
+	function initCalendar( disabledWeekdays ) {
+		destroyCalendars();
+
+		$( '.tsds-date-input' ).each( function () {
+			initSingleCalendar( this, disabledWeekdays );
+		} );
+
+		$( 'input[name="tsds_booking_date"]' ).val( '' );
+		updateSelectedDatePreview( null, '' );
 	}
 
 	// ───────────────────────────────────────────────
@@ -247,23 +277,20 @@
 
 	function hideDateFields() {
 		$( '.tsds-date-field-group' ).hide();
-		const dateInput = document.getElementById( 'tsds-booking-date' );
-		if ( dateInput ) {
-			dateInput.value = '';
-		}
+		$( 'input[name="tsds_booking_date"]' ).val( '' );
 		updateSelectedDatePreview( null, '' );
-		destroyCalendar();
+		destroyCalendars();
 	}
 
 	function showTimeFields() {
-		$( '#tsds-time-field-group' ).show();
+		$( '.tsds-time-field-group' ).show();
 	}
 
 	function hideTimeFields() {
-		$( '#tsds-time-field-group' ).hide();
-		const $select = $( '#tsds-booking-time' );
-		if ( $select.length ) {
-			$select.val( '' );
+		$( '.tsds-time-field-group' ).hide();
+		const $selects = $( '.tsds-time-select' );
+		if ( $selects.length ) {
+			$selects.val( '' );
 		}
 	}
 
@@ -286,7 +313,7 @@
 			$wrapper.hide();
 			hideDateFields();
 			hideTimeFields();
-			destroyCalendar();
+			destroyCalendars();
 			return;
 		}
 
@@ -308,16 +335,16 @@
 	// ───────────────────────────────────────────────
 
 	function showError( type, message ) {
-		const id = 'tsds-' + type + '-error';
-		const $el = $( '#' + id );
-		if ( $el.length ) {
-			$el.text( message ).show();
+		const className = 'tsds-' + type + '-error';
+		const $errors = $( '.' + className );
+		if ( $errors.length ) {
+			$errors.text( message ).show();
 		}
 	}
 
 	function clearError( type ) {
-		const id = 'tsds-' + type + '-error';
-		$( '#' + id ).text( '' ).hide();
+		const className = 'tsds-' + type + '-error';
+		$( '.' + className ).text( '' ).hide();
 	}
 
 	function clearAllErrors() {
@@ -344,7 +371,10 @@
 		clearAllErrors();
 		let valid = true;
 
-		const date = ( document.getElementById( 'tsds-booking-date' ) || {} ).value || '';
+		const date = $( 'input[name="tsds_booking_date"]' ).filter( function () {
+			return !! this.value;
+		} ).first().val() || '';
+
 		if ( ! date ) {
 			showError( 'date', tsdsData.i18n.selectDate );
 			valid = false;
@@ -360,7 +390,10 @@
 		}
 
 		if ( serviceType === 'date_time' ) {
-			const time = ( document.getElementById( 'tsds-booking-time' ) || {} ).value || '';
+			const time = $( '.tsds-time-select' ).filter( function () {
+				return !! this.value;
+			} ).first().val() || '';
+
 			if ( ! time ) {
 				showError( 'time', tsdsData.i18n.selectTime );
 				valid = false;
@@ -422,28 +455,137 @@
 	// ───────────────────────────────────────────────
 
 	function bindAddToCartValidation() {
-		// Use event delegation on the form for compatibility with AJAX themes.
-		$( document ).on( 'click.tsds', '.single_add_to_cart_button', function ( e ) {
-			const $wrapper = $( '.tsds-booking-wrapper' );
-
-			// Only intercept if booking wrapper is present and visible.
-			if ( ! $wrapper.length || ! $wrapper.is( ':visible' ) ) {
+		// Delegate to the whole field-group so any click inside opens the calendar.
+		// This covers:
+		//  - The original .tsds-date-input (pre-Flatpickr or fresh clones).
+		//  - The visible altInput created by Flatpickr (class flatpickr-input),
+		//    whose event listeners are NOT copied when a theme clones the DOM for
+		//    a sticky/mobile drawer.
+		//  - The "change date" scenario where _flatpickr already exists but the
+		//    old code returned without opening it.
+		$( document ).on( 'click.tsds', '.tsds-date-field-group', function ( e ) {
+			// Ignore clicks that land inside the Flatpickr calendar popup itself.
+			if ( $( e.target ).closest( '.flatpickr-calendar' ).length ) {
 				return;
 			}
+
+			const originalInput = $( this ).find( '.tsds-date-input' )[0];
+			if ( ! originalInput ) {
+				return;
+			}
+
+			// Already initialised — open it regardless (handles cloned drawers
+			// and the user wanting to change a previously chosen date).
+			if ( originalInput._flatpickr ) {
+				if ( typeof originalInput._flatpickr.open === 'function' ) {
+					originalInput._flatpickr.open();
+				}
+				return;
+			}
+
+			// First interaction on this input — initialise then open.
+			initSingleCalendar( originalInput, state.currentDisabled || [] );
+			if ( originalInput._flatpickr && typeof originalInput._flatpickr.open === 'function' ) {
+				originalInput._flatpickr.open();
+			}
+		} );
+
+		// Propagate choice across duplicate time dropdowns
+		$( document ).on( 'change.tsds', '.tsds-time-select', function () {
+			$( '.tsds-time-select' ).val( $( this ).val() || '' );
+			clearError( 'time' );
+		} );
+
+		function isBookingUIActive() {
+			const $wrapper = $( '.tsds-booking-wrapper' );
+			return $wrapper.length && $wrapper.is( ':visible' );
+		}
+
+		function syncBookingFieldsToForm( $form ) {
+			if ( ! $form || ! $form.length ) {
+				return;
+			}
+
+			const dateVal = $( 'input[name="tsds_booking_date"]' ).filter( function () { return !! this.value; } ).first().val() || '';
+			const timeVal = $( '.tsds-time-select' ).filter( function () { return !! this.value; } ).first().val() || '';
+			const nonceVal = ( $( 'input[name="tsds_nonce"]' ).first().val() || '' );
+
+			if ( nonceVal ) {
+				let $nonce = $form.find( 'input[name="tsds_nonce"]' );
+				if ( ! $nonce.length ) {
+					$nonce = $( '<input type="hidden" name="tsds_nonce" />' ).appendTo( $form );
+				}
+				$nonce.val( nonceVal );
+			}
+
+			let $date = $form.find( 'input[name="tsds_booking_date"]' );
+			if ( ! $date.length ) {
+				$date = $( '<input type="hidden" name="tsds_booking_date" />' ).appendTo( $form );
+			}
+			$date.val( dateVal );
+
+			let $time = $form.find( 'input[name="tsds_booking_time"]' );
+			if ( ! $time.length ) {
+				$time = $( '<input type="hidden" name="tsds_booking_time" />' ).appendTo( $form );
+			}
+			$time.val( timeVal );
+		}
+
+		function scrollToFirstError() {
+			const $firstError = $( '.tsds-error:visible' ).first();
+			if ( $firstError.length ) {
+				$( 'html, body' ).animate(
+					{ scrollTop: $firstError.offset().top - 80 },
+					300
+				);
+			}
+		}
+
+		// Validate on button click for classic product forms/themes.
+		$( document ).on( 'click.tsds', '.single_add_to_cart_button', function ( e ) {
+			if ( ! isBookingUIActive() ) {
+				return;
+			}
+
+			const $form = $( this ).closest( 'form.cart' );
+			syncBookingFieldsToForm( $form );
 
 			if ( ! validateFields() ) {
 				e.preventDefault();
 				e.stopImmediatePropagation();
-
-				// Scroll to the first visible error.
-				const $firstError = $( '.tsds-error:visible' ).first();
-				if ( $firstError.length ) {
-					$( 'html, body' ).animate(
-						{ scrollTop: $firstError.offset().top - 80 },
-						300
-					);
-				}
+				scrollToFirstError();
 			}
+		} );
+
+		// Validate on form submit for sticky bars / popups that bypass button click handlers.
+		$( document ).on( 'submit.tsds', 'form.cart', function ( e ) {
+			if ( ! isBookingUIActive() ) {
+				return;
+			}
+
+			const $form = $( this );
+			syncBookingFieldsToForm( $form );
+
+			if ( ! validateFields() ) {
+				e.preventDefault();
+				e.stopImmediatePropagation();
+				scrollToFirstError();
+			}
+		} );
+
+		// Ensure booking payload exists for AJAX add-to-cart integrations.
+		$( document.body ).on( 'adding_to_cart.tsds', function ( _event, $button, data ) {
+			if ( ! isBookingUIActive() || ! data ) {
+				return;
+			}
+
+			if ( ! validateFields() ) {
+				return;
+			}
+
+			data.tsds_booking_date = $( 'input[name="tsds_booking_date"]' ).filter( function () { return !! this.value; } ).first().val() || '';
+			data.tsds_booking_time = $( '.tsds-time-select' ).filter( function () { return !! this.value; } ).first().val() || '';
+			data.tsds_nonce = ( $( 'input[name="tsds_nonce"]' ).first().val() || '' );
 		} );
 	}
 
