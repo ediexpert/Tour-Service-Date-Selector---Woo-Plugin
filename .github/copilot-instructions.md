@@ -9,6 +9,7 @@ This repository contains a WooCommerce-based WordPress plugin that enables date 
 - Follow WordPress and WooCommerce best practices for architecture, coding style, security, and compatibility.
 - Prefer WordPress/WooCommerce hooks, filters, and official APIs over custom or intrusive implementations.
 - Maximize compatibility with themes, page builders, and third-party plugins.
+- Keep all plugin functions compatible with WooCommerce-based themes (for example, Shoptimizer) and avoid theme-dependent assumptions in frontend/UI behavior.
 - Use object-oriented programming (OOP) with clear class responsibilities.
 - Keep changes backward-compatible and avoid breaking public behavior unless explicitly requested.
 

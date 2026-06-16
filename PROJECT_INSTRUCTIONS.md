@@ -19,6 +19,7 @@
 
 - Ensure compatibility with WooCommerce simple and variable products.
 - Preserve compatibility with popular themes, page builders, and WooCommerce checkout/cart flows.
+- Maintain compatibility with WooCommerce-based themes, including Shoptimizer, and avoid theme-specific assumptions in markup, CSS, or JavaScript behavior.
 - Ensure features are compatible with current WooCommerce conventions, including HPOS-safe patterns where applicable.
 
 ## Ownership

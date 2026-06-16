@@ -114,6 +114,8 @@ class Assets {
 				'dateLabel'        => __( 'Select Date', 'tour-service-date-selector' ),
 				'timeLabel'        => __( 'Select Time', 'tour-service-date-selector' ),
 				'selectedDate'     => __( 'Selected Date:', 'tour-service-date-selector' ),
+				'openBooking'      => __( 'Choose date and time', 'tour-service-date-selector' ),
+				'closeBooking'     => __( 'Hide date and time', 'tour-service-date-selector' ),
 			),
 			// Variations data will be populated inline for variable products.
 			'variations'      => array(),
