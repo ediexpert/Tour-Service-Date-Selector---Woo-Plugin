@@ -159,15 +159,50 @@
 
 	/**
 	 * Destroy existing Flatpickr instances if present.
+	 *
+	 * IMPORTANT: use `delete element._flatpickr` — never set it to null.
+	 * Flatpickr internally does `if (element._flatpickr) element._flatpickr.destroy()`
+	 * before creating a new instance. If the property is null rather than
+	 * absent, that call throws "Cannot read properties of null (reading 'destroy')"
+	 * and the new calendar is never created. Deleting the property makes the
+	 * check evaluate to false so Flatpickr skips the re-destroy path cleanly.
 	 */
 	function destroyCalendars() {
+		// Sweep all date inputs first — catches instances created outside of
+		// state.calendars (e.g. by a theme sticky/drawer clone).
+		$( '.tsds-date-input' ).each( function () {
+			const fp = this._flatpickr;
+			if ( fp ) {
+				try {
+					if ( typeof fp.destroy === 'function' ) {
+						fp.destroy();
+					}
+				} catch ( e ) {
+					// Already destroyed — swallow and continue.
+				}
+				delete this._flatpickr;
+			}
+		} );
+
+		// Also clean up anything tracked in state that may not be on a visible input.
 		if ( state.calendars && state.calendars.length ) {
 			state.calendars.forEach( function ( fp ) {
-				if ( fp && typeof fp.destroy === 'function' ) {
-					fp.destroy();
+				if ( fp ) {
+					try {
+						const el = fp.element || null;
+						if ( typeof fp.destroy === 'function' ) {
+							fp.destroy();
+						}
+						if ( el && '_flatpickr' in el ) {
+							delete el._flatpickr;
+						}
+					} catch ( e ) {
+						// Swallow — already destroyed.
+					}
 				}
 			} );
 		}
+
 		state.calendars = [];
 	}
 
@@ -178,10 +213,31 @@
 	 * @param {int[]}       disabledWeekdays
 	 */
 	function initSingleCalendar( calendarInput, disabledWeekdays ) {
-		if ( ! calendarInput || calendarInput._flatpickr ) {
+		if ( ! calendarInput ) {
 			return;
 		}
 
+		// If a live instance already exists, open it and bail — no need to reinit.
+		// A live instance always has a calendarContainer; a destroyed/stale one won't.
+		if ( calendarInput._flatpickr && calendarInput._flatpickr.calendarContainer ) {
+			return;
+		}
+
+		// Stale reference without a calendarContainer — destroy cleanly before reinit.
+		if ( calendarInput._flatpickr ) {
+			try {
+				if ( typeof calendarInput._flatpickr.destroy === 'function' ) {
+					calendarInput._flatpickr.destroy();
+				}
+			} catch ( e ) {
+				// Swallow.
+			}
+			delete calendarInput._flatpickr;
+		}
+
+		// Clear any stale display value so Flatpickr starts with a blank input.
+		// (Prevents re-parsing an old human-readable date from a previous selection.)
+		calendarInput.value = '';
 		calendarInput.setAttribute( 'placeholder', getDatePlaceholder( state.currentServiceType ) );
 
 		const fpInstance = flatpickr( calendarInput, {
@@ -259,12 +315,15 @@
 	function initCalendar( disabledWeekdays ) {
 		destroyCalendars();
 
+		// Reset booking data first so initSingleCalendar pre-populate only fires
+		// for the drawer sync case (where the hidden input was set by a previous
+		// user selection), not on variation change where we want a clean slate.
+		$( 'input[name="tsds_booking_date"]' ).val( '' );
+		updateSelectedDatePreview( null, '' );
+
 		$( '.tsds-date-input' ).each( function () {
 			initSingleCalendar( this, disabledWeekdays );
 		} );
-
-		$( 'input[name="tsds_booking_date"]' ).val( '' );
-		updateSelectedDatePreview( null, '' );
 	}
 
 	// ───────────────────────────────────────────────
@@ -476,11 +535,20 @@
 
 			// Already initialised — open it regardless (handles cloned drawers
 			// and the user wanting to change a previously chosen date).
+			// Guard against stale/destroyed instances: a live Flatpickr always
+			// has a calendarContainer; a destroyed one may not.
 			if ( originalInput._flatpickr ) {
-				if ( typeof originalInput._flatpickr.open === 'function' ) {
-					originalInput._flatpickr.open();
+				const fp = originalInput._flatpickr;
+				if ( typeof fp.open === 'function' && fp.calendarContainer ) {
+					fp.open();
+					return;
 				}
-				return;
+				// Stale/destroyed instance — delete the property (never null it)
+				// so Flatpickr's internal guard doesn't crash on re-init.
+				try {
+					if ( typeof fp.destroy === 'function' ) { fp.destroy(); }
+				} catch ( e ) { /* already gone */ }
+				delete originalInput._flatpickr;
 			}
 
 			// First interaction on this input — initialise then open.
