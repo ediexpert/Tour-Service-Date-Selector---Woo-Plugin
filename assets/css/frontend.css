@@ -12,10 +12,12 @@
 .tsds-booking-wrapper {
 	margin: 1.25em 0;
 	padding: 1.25em;
-	background: #f9f9f9;
-	border: 1px solid #e5e5e5;
+	background: var(--tsds-surface, var(--wp--preset--color--base, transparent));
+	border: 1px solid var(--tsds-border, currentColor);
 	border-radius: 4px;
 	box-sizing: border-box;
+	font: inherit;
+	color: inherit;
 }
 
 /* ─── Field groups ────────────────────────────────────────────── */
@@ -35,7 +37,8 @@
 	margin-bottom: 0.4em;
 	font-weight: 600;
 	font-size: 0.9em;
-	color: #333;
+	font-family: inherit;
+	color: inherit;
 }
 
 .tsds-booking-wrapper .tsds-required {
@@ -52,29 +55,48 @@
 
 /* Flatpickr inline overrides — scoped to our wrapper */
 .tsds-booking-wrapper .flatpickr-calendar.inline {
+	font-family: inherit;
+	font-size: inherit;
+	line-height: inherit;
 	box-shadow: none;
-	border: 1px solid #ddd;
+	border: 1px solid var(--tsds-border, currentColor);
 	border-radius: 4px;
 	max-width: 100%;
+	background: var(--tsds-calendar-bg, var(--tsds-surface, transparent));
+	color: inherit;
+}
+
+.tsds-booking-wrapper .flatpickr-months,
+.tsds-booking-wrapper .flatpickr-weekdays,
+.tsds-booking-wrapper .flatpickr-days,
+.tsds-booking-wrapper .dayContainer,
+.tsds-booking-wrapper .flatpickr-current-month,
+.tsds-booking-wrapper .flatpickr-monthDropdown-months,
+.tsds-booking-wrapper .flatpickr-weekday,
+.tsds-booking-wrapper .flatpickr-day {
+	font: inherit;
+	color: inherit;
 }
 
 .tsds-booking-wrapper .flatpickr-day.disabled,
 .tsds-booking-wrapper .flatpickr-day.disabled:hover {
-	background: #f0f0f0;
-	color: #aaa;
+	background: rgba(0, 0, 0, 0.06);
+	color: rgba(0, 0, 0, 0.45);
+	background: color-mix(in srgb, currentColor 7%, transparent);
+	color: color-mix(in srgb, currentColor 45%, transparent);
 	cursor: not-allowed;
 	text-decoration: line-through;
 }
 
 .tsds-booking-wrapper .flatpickr-day.selected,
 .tsds-booking-wrapper .flatpickr-day.selected:hover {
-	background: #2271b1;
-	border-color: #2271b1;
-	color: #fff;
+	background: var(--tsds-accent, var(--wp--preset--color--primary, #2271b1));
+	border-color: var(--tsds-accent, var(--wp--preset--color--primary, #2271b1));
+	color: var(--tsds-accent-contrast, #fff);
 }
 
 .tsds-booking-wrapper .flatpickr-day.today {
-	border-color: #2271b1;
+	border-color: var(--tsds-accent, var(--wp--preset--color--primary, #2271b1));
 }
 
 /* ─── Time select ─────────────────────────────────────────────── */
@@ -84,20 +106,20 @@
 	width: 100%;
 	max-width: 200px;
 	padding: 0.5em 0.75em;
-	border: 1px solid #ddd;
+	border: 1px solid var(--tsds-border, currentColor);
 	border-radius: 4px;
-	background-color: #fff;
-	font-size: 1em;
-	color: #333;
+	background-color: var(--tsds-input-bg, transparent);
+	font: inherit;
+	color: inherit;
 	appearance: auto;
 	box-sizing: border-box;
 	cursor: pointer;
 }
 
 .tsds-booking-wrapper .tsds-time-select:focus {
-	outline: 2px solid #2271b1;
+	outline: 2px solid var(--tsds-accent, var(--wp--preset--color--primary, #2271b1));
 	outline-offset: 1px;
-	border-color: #2271b1;
+	border-color: var(--tsds-accent, var(--wp--preset--color--primary, #2271b1));
 }
 
 /* ─── Error messages ──────────────────────────────────────────── */
@@ -105,9 +127,11 @@
 .tsds-booking-wrapper .tsds-error {
 	margin-top: 0.4em;
 	padding: 0.4em 0.6em;
-	color: #cc0000;
-	background: #fff0f0;
-	border: 1px solid #f5c6cb;
+	color: var(--tsds-error, #b00020);
+	background: rgba(176, 0, 32, 0.08);
+	border: 1px solid rgba(176, 0, 32, 0.35);
+	background: color-mix(in srgb, var(--tsds-error, #b00020) 8%, transparent);
+	border: 1px solid color-mix(in srgb, var(--tsds-error, #b00020) 35%, transparent);
 	border-radius: 3px;
 	font-size: 0.875em;
 }
