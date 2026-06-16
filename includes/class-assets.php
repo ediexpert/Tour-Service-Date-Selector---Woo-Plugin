@@ -108,6 +108,7 @@ class Assets {
 			'nonce'           => wp_create_nonce( 'tsds_add_to_cart' ),
 			'i18n'            => array(
 				'selectDate'       => __( 'Please select a date.', 'tour-service-date-selector' ),
+				'selectDateTime'   => __( 'Please select a date and time.', 'tour-service-date-selector' ),
 				'selectTime'       => __( 'Please select a time.', 'tour-service-date-selector' ),
 				'invalidDate'      => __( 'The selected date is not available.', 'tour-service-date-selector' ),
 				'invalidTime'      => __( 'The selected time is not available for this date.', 'tour-service-date-selector' ),

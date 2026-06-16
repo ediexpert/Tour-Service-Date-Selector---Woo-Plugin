@@ -20,35 +20,6 @@
 	color: inherit;
 }
 
-.tsds-booking-wrapper .tsds-mobile-toggle {
-	display: none;
-	width: 100%;
-	padding: 0.75em 0.9em;
-	border: 1px solid var(--tsds-border, currentColor);
-	border-radius: 4px;
-	background: transparent;
-	color: inherit;
-	font: inherit;
-	font-weight: 600;
-	text-align: left;
-	cursor: pointer;
-	margin-bottom: 0.9em;
-	position: relative;
-}
-
-.tsds-booking-wrapper .tsds-mobile-toggle::after {
-	content: '\25BE';
-	position: absolute;
-	right: 0.9em;
-	top: 50%;
-	transform: translateY( -50% );
-	font-size: 0.85em;
-}
-
-.tsds-booking-wrapper .tsds-mobile-toggle[aria-expanded="true"]::after {
-	content: '\25B4';
-}
-
 /* ─── Field groups ────────────────────────────────────────────── */
 
 .tsds-booking-wrapper .tsds-field-group {
@@ -257,14 +228,6 @@
 	.tsds-booking-wrapper .tsds-date-input,
 	.tsds-booking-wrapper .flatpickr-input[readonly] {
 		max-width: 100%;
-	}
-
-	.tsds-booking-wrapper .tsds-mobile-toggle {
-		display: block;
-	}
-
-	.tsds-booking-wrapper.tsds-mobile-collapsed .tsds-booking-content {
-		display: none;
 	}
 
 	.tsds-booking-wrapper .tsds-date-field-group .flatpickr-calendar {

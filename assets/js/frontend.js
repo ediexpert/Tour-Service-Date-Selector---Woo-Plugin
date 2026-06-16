@@ -29,10 +29,22 @@
 		currentDateFormat: tsdsData.displayDateFormat || 'F j, Y',
 		currentSchedule:    tsdsData.schedule     || [],
 		currentDisabled:    tsdsData.disabledWeekdays || [],
-		mobileCollapsed: false,
-		mobileBound: false,
 		initialized: false,
 	};
+
+	/**
+	 * Resolve date input placeholder from service type.
+	 *
+	 * @param {string} serviceType
+	 * @return {string}
+	 */
+	function getDatePlaceholder( serviceType ) {
+		if ( serviceType === 'date_time' ) {
+			return tsdsData.i18n.selectDateTime || 'Please select a date and time.';
+		}
+
+		return tsdsData.i18n.selectDate || 'Please select a date.';
+	}
 
 	// ───────────────────────────────────────────────
 	// Utility helpers
@@ -170,6 +182,7 @@
 		}
 
 		calendarInput.value = '';
+		calendarInput.setAttribute( 'placeholder', getDatePlaceholder( state.currentServiceType ) );
 
 		updateSelectedDatePreview( null, '' );
 
@@ -213,7 +226,7 @@
 				}
 
 				targetInput.setAttribute( 'readonly', 'readonly' );
-				targetInput.setAttribute( 'placeholder', tsdsData.i18n.selectDate || 'Select date' );
+				targetInput.setAttribute( 'placeholder', getDatePlaceholder( state.currentServiceType ) );
 				targetInput.addEventListener( 'click', function () {
 					instance.open();
 				} );
@@ -310,72 +323,6 @@
 	function clearAllErrors() {
 		clearError( 'date' );
 		clearError( 'time' );
-	}
-
-	function isMobileViewport() {
-		return window.matchMedia( '(max-width: 480px)' ).matches;
-	}
-
-	function setMobileCollapseState( collapsed ) {
-		const wrapper = document.querySelector( '.tsds-booking-wrapper' );
-		const toggle = document.getElementById( 'tsds-mobile-toggle' );
-
-		if ( ! wrapper || ! toggle || ! isMobileViewport() ) {
-			return;
-		}
-
-		state.mobileCollapsed = !! collapsed;
-		wrapper.classList.toggle( 'tsds-mobile-collapsed', state.mobileCollapsed );
-		toggle.setAttribute( 'aria-expanded', state.mobileCollapsed ? 'false' : 'true' );
-		toggle.textContent = state.mobileCollapsed
-			? ( tsdsData.i18n.openBooking || 'Choose date and time' )
-			: ( tsdsData.i18n.closeBooking || 'Hide date and time' );
-	}
-
-	function expandMobileBookingPanel() {
-		if ( isMobileViewport() ) {
-			setMobileCollapseState( false );
-		}
-	}
-
-	function initMobileAccordion() {
-		const wrapper = document.querySelector( '.tsds-booking-wrapper' );
-		const toggle = document.getElementById( 'tsds-mobile-toggle' );
-
-		if ( ! wrapper || ! toggle ) {
-			return;
-		}
-
-		if ( ! state.mobileBound ) {
-			state.mobileBound = true;
-
-			toggle.addEventListener( 'click', function () {
-				if ( ! isMobileViewport() ) {
-					return;
-				}
-				setMobileCollapseState( ! state.mobileCollapsed );
-			} );
-
-			window.addEventListener( 'resize', function () {
-				if ( isMobileViewport() ) {
-					setMobileCollapseState( true );
-				} else {
-					wrapper.classList.remove( 'tsds-mobile-collapsed' );
-					toggle.setAttribute( 'aria-expanded', 'true' );
-					toggle.textContent = tsdsData.i18n.closeBooking || 'Hide date and time';
-					state.mobileCollapsed = false;
-				}
-			} );
-		}
-
-		if ( isMobileViewport() ) {
-			setMobileCollapseState( true );
-		} else {
-			wrapper.classList.remove( 'tsds-mobile-collapsed' );
-			toggle.setAttribute( 'aria-expanded', 'true' );
-			toggle.textContent = tsdsData.i18n.closeBooking || 'Hide date and time';
-			state.mobileCollapsed = false;
-		}
 	}
 
 	// ───────────────────────────────────────────────
@@ -487,7 +434,6 @@
 			if ( ! validateFields() ) {
 				e.preventDefault();
 				e.stopImmediatePropagation();
-				expandMobileBookingPanel();
 
 				// Scroll to the first visible error.
 				const $firstError = $( '.tsds-error:visible' ).first();
@@ -520,9 +466,6 @@
 			tsdsData.schedule,
 			tsdsData.disabledWeekdays
 		);
-
-		// Mobile accordion behavior for booking panel.
-		initMobileAccordion();
 
 		// Variable product events.
 		if ( tsdsData.productType === 'variable' ) {

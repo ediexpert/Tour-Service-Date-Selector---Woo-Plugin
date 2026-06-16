@@ -28,6 +28,10 @@ if ( Helper::SERVICE_OPEN_DATED === $service_type && ! $is_variable ) {
 $show_date = in_array( $service_type, array( Helper::SERVICE_DATE_ONLY, Helper::SERVICE_DATE_TIME ), true );
 $show_time = ( Helper::SERVICE_DATE_TIME === $service_type );
 
+$date_input_placeholder = ( Helper::SERVICE_DATE_TIME === $service_type )
+    ? __( 'Select date and time', 'tour-service-date-selector' )
+    : __( 'Select date', 'tour-service-date-selector' );
+
 // For variable products, start hidden; JS will reveal as needed.
 $wrapper_style = ( $is_variable && Helper::SERVICE_OPEN_DATED === $service_type )
     ? ' style="display:none;"'
@@ -48,16 +52,6 @@ $wrapper_style = ( $is_variable && Helper::SERVICE_OPEN_DATED === $service_type 
         value="<?php echo esc_attr( wp_create_nonce( 'tsds_add_to_cart' ) ); ?>"
     />
 
-    <button
-        type="button"
-        class="tsds-mobile-toggle"
-        id="tsds-mobile-toggle"
-        aria-expanded="false"
-        aria-controls="tsds-booking-content"
-    >
-        <?php esc_html_e( 'Choose date and time', 'tour-service-date-selector' ); ?>
-    </button>
-
     <div class="tsds-booking-content" id="tsds-booking-content">
         <?php if ( $show_date || $is_variable ) : ?>
         <div
@@ -74,12 +68,12 @@ $wrapper_style = ( $is_variable && Helper::SERVICE_OPEN_DATED === $service_type 
                 id="tsds-calendar"
                 class="tsds-date-input"
                 value=""
-                placeholder="<?php esc_attr_e( 'Select date', 'tour-service-date-selector' ); ?>"
+                placeholder="<?php echo esc_attr( $date_input_placeholder ); ?>"
                 autocomplete="off"
                 readonly
                 aria-required="true"
                 aria-describedby="tsds-date-error"
-                aria-label="<?php esc_attr_e( 'Select date', 'tour-service-date-selector' ); ?>"
+                aria-label="<?php echo esc_attr( $date_input_placeholder ); ?>"
             />
 
             <p class="tsds-selected-date" id="tsds-selected-date" aria-live="polite" style="display:none;"></p>
