@@ -1,0 +1,118 @@
+/**
+ * Tour Service Date Selector — Admin Styles
+ *
+ * All selectors are strictly prefixed with .tsds- to avoid conflicts.
+ *
+ * @package TSDS
+ */
+
+/* ─── Panel heading ───────────────────────────────────────────── */
+
+.tsds-admin-panel .tsds-schedule-heading,
+.tsds-variation-settings .tsds-schedule-heading {
+	padding: 12px 12px 4px;
+	margin: 0 0 4px;
+	font-size: 14px;
+	font-weight: 600;
+	color: #23282d;
+}
+
+.tsds-variation-settings .tsds-schedule-heading {
+	font-size: 13px;
+	margin-top: 8px;
+}
+
+.tsds-admin-panel .tsds-schedule-description,
+.tsds-variation-settings .tsds-variation-description {
+	padding: 0 12px 8px;
+	margin: 0;
+	color: #666;
+	font-size: 12px;
+}
+
+/* ─── Schedule table ──────────────────────────────────────────── */
+
+.tsds-admin-panel .tsds-schedule-table,
+.tsds-variation-settings .tsds-schedule-table {
+	margin: 0 12px 16px;
+	width: calc( 100% - 24px );
+	border-collapse: collapse;
+}
+
+.tsds-admin-panel .tsds-schedule-table th,
+.tsds-variation-settings .tsds-schedule-table th {
+	background: #f5f5f5;
+	padding: 7px 10px;
+	font-size: 12px;
+	font-weight: 600;
+	text-align: left;
+	border-bottom: 1px solid #e1e1e1;
+}
+
+.tsds-admin-panel .tsds-schedule-table td,
+.tsds-variation-settings .tsds-schedule-table td {
+	padding: 7px 10px;
+	border-bottom: 1px solid #f0f0f0;
+	vertical-align: middle;
+}
+
+.tsds-admin-panel .tsds-schedule-table .tsds-schedule-day,
+.tsds-variation-settings .tsds-schedule-table .tsds-schedule-day {
+	font-weight: 500;
+	width: 100px;
+}
+
+.tsds-admin-panel .tsds-schedule-table .tsds-time-input,
+.tsds-variation-settings .tsds-schedule-table .tsds-time-input {
+	padding: 3px 6px;
+	border: 1px solid #8c8f94;
+	border-radius: 3px;
+}
+
+/* ─── Variation settings wrapper ─────────────────────────────── */
+
+.tsds-variation-settings {
+	margin: 10px 0 0;
+	padding: 10px;
+	background: #fdfdfd;
+	border-top: 1px solid #e1e1e1;
+}
+
+.tsds-variation-heading {
+	margin: 0 0 4px;
+	font-size: 13px;
+	font-weight: 600;
+	color: #23282d;
+}
+
+/* ─── Responsive ─────────────────────────────────────────────── */
+
+@media screen and ( max-width: 782px ) {
+	.tsds-admin-panel .tsds-schedule-table thead,
+	.tsds-variation-settings .tsds-schedule-table thead {
+		display: none;
+	}
+
+	.tsds-admin-panel .tsds-schedule-table tr,
+	.tsds-variation-settings .tsds-schedule-table tr {
+		display: block;
+		margin-bottom: 8px;
+		border: 1px solid #e1e1e1;
+		border-radius: 3px;
+	}
+
+	.tsds-admin-panel .tsds-schedule-table td,
+	.tsds-variation-settings .tsds-schedule-table td {
+		display: block;
+		text-align: right;
+		border: none;
+		border-bottom: 1px solid #f0f0f0;
+	}
+
+	.tsds-admin-panel .tsds-schedule-table td::before,
+	.tsds-variation-settings .tsds-schedule-table td::before {
+		content: attr( data-label );
+		float: left;
+		font-weight: 600;
+	}
+}

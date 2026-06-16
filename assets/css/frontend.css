@@ -1,0 +1,136 @@
+/**
+ * Tour Service Date Selector — Frontend Styles
+ *
+ * All selectors are strictly prefixed with .tsds- to avoid
+ * conflicts with Elementor, Shoptimizer, or any other theme/plugin.
+ *
+ * @package TSDS
+ */
+
+/* ─── Wrapper ─────────────────────────────────────────────────── */
+
+.tsds-booking-wrapper {
+	margin: 1.25em 0;
+	padding: 1.25em;
+	background: #f9f9f9;
+	border: 1px solid #e5e5e5;
+	border-radius: 4px;
+	box-sizing: border-box;
+}
+
+/* ─── Field groups ────────────────────────────────────────────── */
+
+.tsds-booking-wrapper .tsds-field-group {
+	margin-bottom: 1.25em;
+}
+
+.tsds-booking-wrapper .tsds-field-group:last-child {
+	margin-bottom: 0;
+}
+
+/* ─── Labels ──────────────────────────────────────────────────── */
+
+.tsds-booking-wrapper .tsds-label {
+	display: block;
+	margin-bottom: 0.4em;
+	font-weight: 600;
+	font-size: 0.9em;
+	color: #333;
+}
+
+.tsds-booking-wrapper .tsds-required {
+	color: #cc0000;
+	margin-left: 2px;
+}
+
+/* ─── Calendar container ──────────────────────────────────────── */
+
+.tsds-booking-wrapper .tsds-calendar-container {
+	display: inline-block;
+	max-width: 100%;
+}
+
+/* Flatpickr inline overrides — scoped to our wrapper */
+.tsds-booking-wrapper .flatpickr-calendar.inline {
+	box-shadow: none;
+	border: 1px solid #ddd;
+	border-radius: 4px;
+	max-width: 100%;
+}
+
+.tsds-booking-wrapper .flatpickr-day.disabled,
+.tsds-booking-wrapper .flatpickr-day.disabled:hover {
+	background: #f0f0f0;
+	color: #aaa;
+	cursor: not-allowed;
+	text-decoration: line-through;
+}
+
+.tsds-booking-wrapper .flatpickr-day.selected,
+.tsds-booking-wrapper .flatpickr-day.selected:hover {
+	background: #2271b1;
+	border-color: #2271b1;
+	color: #fff;
+}
+
+.tsds-booking-wrapper .flatpickr-day.today {
+	border-color: #2271b1;
+}
+
+/* ─── Time select ─────────────────────────────────────────────── */
+
+.tsds-booking-wrapper .tsds-time-select {
+	display: block;
+	width: 100%;
+	max-width: 200px;
+	padding: 0.5em 0.75em;
+	border: 1px solid #ddd;
+	border-radius: 4px;
+	background-color: #fff;
+	font-size: 1em;
+	color: #333;
+	appearance: auto;
+	box-sizing: border-box;
+	cursor: pointer;
+}
+
+.tsds-booking-wrapper .tsds-time-select:focus {
+	outline: 2px solid #2271b1;
+	outline-offset: 1px;
+	border-color: #2271b1;
+}
+
+/* ─── Error messages ──────────────────────────────────────────── */
+
+.tsds-booking-wrapper .tsds-error {
+	margin-top: 0.4em;
+	padding: 0.4em 0.6em;
+	color: #cc0000;
+	background: #fff0f0;
+	border: 1px solid #f5c6cb;
+	border-radius: 3px;
+	font-size: 0.875em;
+}
+
+/* ─── Order meta (admin + emails) ────────────────────────────── */
+
+.tsds-order-meta {
+	margin-top: 0.5em;
+}
+
+.tsds-order-meta .tsds-order-meta__row {
+	margin: 0.2em 0;
+	font-size: 0.9em;
+}
+
+/* ─── Responsive ─────────────────────────────────────────────── */
+
+@media ( max-width: 480px ) {
+	.tsds-booking-wrapper .flatpickr-calendar.inline {
+		width: 100% !important;
+	}
+
+	.tsds-booking-wrapper .tsds-time-select {
+		max-width: 100%;
+	}
+}
