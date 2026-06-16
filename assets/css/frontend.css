@@ -78,10 +78,11 @@
 /* ─── Date input / calendar popup ─────────────────────────────── */
 
 .tsds-booking-wrapper .tsds-date-input,
-.tsds-booking-wrapper .flatpickr-input[readonly] {
+.tsds-booking-wrapper .flatpickr-input[readonly],
+.tsds-booking-wrapper .flatpickr-input.form-control.input[readonly] {
 	display: block;
 	width: 100%;
-	max-width: 260px;
+	max-width: 100%;
 	padding: 0.5em 0.75em;
 	border: 1px solid var(--tsds-border, currentColor);
 	border-radius: 4px;
@@ -166,14 +167,18 @@
 	border-color: var(--tsds-calendar-hover, #eff6ff);
 }
 
+.tsds-booking-wrapper .flatpickr-day.flatpickr-disabled,
+.tsds-booking-wrapper .flatpickr-day.flatpickr-disabled:hover,
 .tsds-booking-wrapper .flatpickr-day.disabled,
 .tsds-booking-wrapper .flatpickr-day.disabled:hover {
-	background: rgba(0, 0, 0, 0.06);
-	color: rgba(0, 0, 0, 0.45);
-	background: color-mix(in srgb, currentColor 7%, transparent);
-	color: color-mix(in srgb, currentColor 45%, transparent);
+	background: var(--tsds-calendar-disabled-bg, #f2f4f7);
+	border-color: var(--tsds-calendar-disabled-border, #e4e7ec);
+	color: var(--tsds-calendar-disabled-text, #667085);
+	opacity: 1;
 	cursor: not-allowed;
 	text-decoration: line-through;
+	text-decoration-thickness: 2px;
+	text-decoration-color: currentColor;
 }
 
 .tsds-booking-wrapper .flatpickr-day.selected,
@@ -199,7 +204,7 @@
 .tsds-booking-wrapper .tsds-time-select {
 	display: block;
 	width: 100%;
-	max-width: 200px;
+	max-width: var(--tsds-control-max-width, 260px);
 	padding: 0.5em 0.75em;
 	border: 1px solid var(--tsds-border, currentColor);
 	border-radius: 4px;
