@@ -42,6 +42,26 @@ class Settings {
 			)
 		);
 
+		register_setting(
+			'tsds_settings_group',
+			Helper::OPTION_DATE_LABEL,
+			array(
+				'type'              => 'string',
+				'sanitize_callback' => array( Helper::class, 'sanitize_label' ),
+				'default'           => Helper::DEFAULT_DATE_LABEL,
+			)
+		);
+
+		register_setting(
+			'tsds_settings_group',
+			Helper::OPTION_DATE_ERROR,
+			array(
+				'type'              => 'string',
+				'sanitize_callback' => array( Helper::class, 'sanitize_label' ),
+				'default'           => Helper::DEFAULT_DATE_ERROR,
+			)
+		);
+
 		add_settings_section(
 			'tsds_general_section',
 			__( 'General Settings', 'tour-service-date-selector' ),
@@ -55,6 +75,22 @@ class Settings {
 			'tsds_date_format_field',
 			__( 'Date Format', 'tour-service-date-selector' ),
 			array( $this, 'render_date_format_field' ),
+			'tsds-settings',
+			'tsds_general_section'
+		);
+
+		add_settings_field(
+			'tsds_date_label_field',
+			__( 'Date Field Label', 'tour-service-date-selector' ),
+			array( $this, 'render_date_label_field' ),
+			'tsds-settings',
+			'tsds_general_section'
+		);
+
+		add_settings_field(
+			'tsds_date_error_field',
+			__( 'Date Validation Error', 'tour-service-date-selector' ),
+			array( $this, 'render_date_error_field' ),
 			'tsds-settings',
 			'tsds_general_section'
 		);
@@ -92,6 +128,56 @@ class Settings {
 		</select>
 		<p class="description">
 			<?php esc_html_e( 'This format is applied to booking dates across all products, cart, checkout, emails, and order details.', 'tour-service-date-selector' ); ?>
+		</p>
+		<?php
+	}
+
+	/**
+	 * Render date label field.
+	 */
+	public function render_date_label_field(): void {
+		$current = Helper::get_date_label();
+		?>
+		<input
+			type="text"
+			id="<?php echo esc_attr( Helper::OPTION_DATE_LABEL ); ?>"
+			name="<?php echo esc_attr( Helper::OPTION_DATE_LABEL ); ?>"
+			value="<?php echo esc_attr( $current ); ?>"
+			class="regular-text"
+		/>
+		<p class="description">
+			<?php
+			printf(
+				/* translators: %s: default label value */
+				esc_html__( 'Label shown above the date picker on the product page. Default: %s', 'tour-service-date-selector' ),
+				'<strong>' . esc_html( Helper::DEFAULT_DATE_LABEL ) . '</strong>'
+			);
+			?>
+		</p>
+		<?php
+	}
+
+	/**
+	 * Render date error message field.
+	 */
+	public function render_date_error_field(): void {
+		$current = Helper::get_date_error();
+		?>
+		<input
+			type="text"
+			id="<?php echo esc_attr( Helper::OPTION_DATE_ERROR ); ?>"
+			name="<?php echo esc_attr( Helper::OPTION_DATE_ERROR ); ?>"
+			value="<?php echo esc_attr( $current ); ?>"
+			class="regular-text"
+		/>
+		<p class="description">
+			<?php
+			printf(
+				/* translators: %s: default error message */
+				esc_html__( 'Validation error shown when customer tries to add to cart without selecting a date. Default: %s', 'tour-service-date-selector' ),
+				'<strong>' . esc_html( Helper::DEFAULT_DATE_ERROR ) . '</strong>'
+			);
+			?>
 		</p>
 		<?php
 	}

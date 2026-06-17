@@ -36,6 +36,14 @@ class Helper {
 	public const DEFAULT_DATE_FORMAT = 'F j, Y';
 
 	/**
+	 * Option keys and defaults for configurable UI labels.
+	 */
+	public const OPTION_DATE_LABEL   = 'tsds_date_label';
+	public const DEFAULT_DATE_LABEL  = 'Select Date';
+	public const OPTION_DATE_ERROR   = 'tsds_date_error';
+	public const DEFAULT_DATE_ERROR  = 'Please select a date.';
+
+	/**
 	 * Ordered weekday slugs.
 	 *
 	 * @var string[]
@@ -117,6 +125,38 @@ class Helper {
 	public static function get_date_format(): string {
 		$format = get_option( self::OPTION_DATE_FORMAT, self::DEFAULT_DATE_FORMAT );
 		return self::sanitize_date_format( (string) $format );
+	}
+
+	/**
+	 * Sanitize a plain text label / message value.
+	 *
+	 * @param string $value Raw value.
+	 * @return string
+	 */
+	public static function sanitize_label( string $value ): string {
+		return sanitize_text_field( $value );
+	}
+
+	/**
+	 * Get the configurable date field label.
+	 *
+	 * @return string
+	 */
+	public static function get_date_label(): string {
+		$label = get_option( self::OPTION_DATE_LABEL, self::DEFAULT_DATE_LABEL );
+		$clean = self::sanitize_label( (string) $label );
+		return $clean !== '' ? $clean : self::DEFAULT_DATE_LABEL;
+	}
+
+	/**
+	 * Get the configurable date validation error message.
+	 *
+	 * @return string
+	 */
+	public static function get_date_error(): string {
+		$error = get_option( self::OPTION_DATE_ERROR, self::DEFAULT_DATE_ERROR );
+		$clean = self::sanitize_label( (string) $error );
+		return $clean !== '' ? $clean : self::DEFAULT_DATE_ERROR;
 	}
 
 	/**

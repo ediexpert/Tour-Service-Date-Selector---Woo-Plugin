@@ -43,7 +43,9 @@
 			return tsdsData.i18n.selectDateTime || 'Please select a date and time.';
 		}
 
-		return tsdsData.i18n.selectDate || 'Please select a date.';
+		// Use the configurable label (e.g. 'Select Date') as the placeholder,
+		// not the error message string.
+		return tsdsData.i18n.dateLabel || 'Select Date';
 	}
 
 	// ───────────────────────────────────────────────

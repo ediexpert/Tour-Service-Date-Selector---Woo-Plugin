@@ -30,7 +30,7 @@ $show_time = ( Helper::SERVICE_DATE_TIME === $service_type );
 
 $date_input_placeholder = ( Helper::SERVICE_DATE_TIME === $service_type )
     ? __( 'Select date and time', 'tour-service-date-selector' )
-    : __( 'Select date', 'tour-service-date-selector' );
+    : Helper::get_date_label();
 
 // For variable products, start hidden; JS will reveal as needed.
 $wrapper_style = ( $is_variable && Helper::SERVICE_OPEN_DATED === $service_type )
@@ -59,8 +59,7 @@ $wrapper_style = ( $is_variable && Helper::SERVICE_OPEN_DATED === $service_type 
             <?php echo ( ! $show_date && $is_variable ) ? 'style="display:none;"' : ''; // phpcs:ignore ?>
         >
             <label class="tsds-label" for="tsds-calendar">
-                <?php esc_html_e( 'Select Date', 'tour-service-date-selector' ); ?>
-                <span class="tsds-required" aria-hidden="true">*</span>
+				<?php echo esc_html( Helper::get_date_label() ); ?>
             </label>
 
             <input
