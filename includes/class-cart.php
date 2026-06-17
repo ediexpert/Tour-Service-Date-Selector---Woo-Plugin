@@ -44,12 +44,24 @@ class Cart {
 	 * @return bool
 	 */
 	public function validate_add_to_cart( bool $passed, int $product_id, int $quantity ): bool {
-		// Verify nonce.
-		if ( ! isset( $_POST['tsds_nonce'] ) || // phpcs:ignore WordPress.Security.NonceVerification
-			! wp_verify_nonce( sanitize_text_field( wp_unslash( $_POST['tsds_nonce'] ) ), 'tsds_add_to_cart' ) ) {
+		unset( $quantity );
 
-			// If no nonce but it's an open-dated product, allow through.
-			$service_type = Helper::get_service_type( $product_id );
+		$variation_id = isset( $_POST['variation_id'] ) // phpcs:ignore WordPress.Security.NonceVerification
+			? (int) wp_unslash( (string) $_POST['variation_id'] ) // phpcs:ignore WordPress.Security.NonceVerification
+			: 0;
+
+		$variation_id_or_null = $variation_id > 0 ? $variation_id : null;
+
+		$nonce = isset( $_POST['tsds_nonce'] ) // phpcs:ignore WordPress.Security.NonceVerification
+			? sanitize_text_field( wp_unslash( (string) $_POST['tsds_nonce'] ) ) // phpcs:ignore WordPress.Security.NonceVerification
+			: '';
+
+		// Verify nonce.
+		if ( '' === $nonce || ! wp_verify_nonce( $nonce, 'tsds_add_to_cart' ) ) {
+
+			// Allow nonce bypass only for truly open-dated selection,
+			// including variation-level service type overrides.
+			$service_type = Helper::get_service_type( $product_id, $variation_id_or_null );
 			if ( Helper::SERVICE_OPEN_DATED === $service_type ) {
 				return $passed;
 			}
@@ -63,11 +75,7 @@ class Cart {
 			return false;
 		}
 
-		$variation_id = isset( $_POST['variation_id'] ) // phpcs:ignore WordPress.Security.NonceVerification
-			? (int) $_POST['variation_id'] // phpcs:ignore WordPress.Security.NonceVerification
-			: null;
-
-		$result = Validation::validate_from_post( $product_id, $variation_id );
+		$result = Validation::validate_from_post( $product_id, $variation_id_or_null );
 
 		if ( ! $result['valid'] ) {
 			wc_add_notice( $result['error'], 'error' );
@@ -137,7 +145,7 @@ class Cart {
 			);
 
 			$item_data[] = array(
-				'name'  => __( 'Date', 'tour-service-date-selector' ),
+				'name'  => Helper::get_date_label(),
 				'value' => esc_html( $display_date ),
 			);
 		}

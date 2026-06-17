@@ -83,7 +83,7 @@ $wrapper_style = ( $is_variable && Helper::SERVICE_OPEN_DATED === $service_type 
                 name="tsds_booking_date"
                 value=""
                 aria-required="true"
-                aria-label="<?php esc_attr_e( 'Booking date', 'tour-service-date-selector' ); ?>"
+                aria-label="<?php echo esc_attr( Helper::get_date_label() ); ?>"
             />
 
             <div

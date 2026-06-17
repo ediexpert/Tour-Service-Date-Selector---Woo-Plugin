@@ -42,6 +42,8 @@ class Helper {
 	public const DEFAULT_DATE_LABEL  = 'Select Date';
 	public const OPTION_DATE_ERROR   = 'tsds_date_error';
 	public const DEFAULT_DATE_ERROR  = 'Please select a date.';
+	public const OPTION_DELETE_DATA_ON_UNINSTALL  = 'tsds_delete_data_on_uninstall';
+	public const DEFAULT_DELETE_DATA_ON_UNINSTALL = 'no';
 
 	/**
 	 * Ordered weekday slugs.
@@ -135,6 +137,27 @@ class Helper {
 	 */
 	public static function sanitize_label( string $value ): string {
 		return sanitize_text_field( $value );
+	}
+
+	/**
+	 * Sanitize yes/no option values.
+	 *
+	 * @param string $value Raw value.
+	 * @return string
+	 */
+	public static function sanitize_yes_no( string $value ): string {
+		$clean = strtolower( sanitize_text_field( $value ) );
+		return in_array( $clean, array( 'yes', 'no' ), true ) ? $clean : 'no';
+	}
+
+	/**
+	 * Whether plugin data should be deleted during uninstall.
+	 *
+	 * @return bool
+	 */
+	public static function should_delete_data_on_uninstall(): bool {
+		$value = get_option( self::OPTION_DELETE_DATA_ON_UNINSTALL, self::DEFAULT_DELETE_DATA_ON_UNINSTALL );
+		return 'yes' === self::sanitize_yes_no( (string) $value );
 	}
 
 	/**

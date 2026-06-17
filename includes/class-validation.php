@@ -50,7 +50,7 @@ class Validation {
 		if ( empty( $clean_date ) ) {
 			return new \WP_Error(
 				'tsds_missing_date',
-				__( 'Please select a valid booking date before adding to cart.', 'tour-service-date-selector' )
+				Helper::get_date_error()
 			);
 		}
 

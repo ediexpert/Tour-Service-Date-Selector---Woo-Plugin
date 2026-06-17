@@ -10,10 +10,19 @@
 // If uninstall not called from WordPress, exit.
 defined( 'WP_UNINSTALL_PLUGIN' ) || exit;
 
+$delete_data = get_option( 'tsds_delete_data_on_uninstall', 'no' );
+
+if ( 'yes' !== $delete_data ) {
+	$network_delete_data = get_site_option( 'tsds_delete_data_on_uninstall', 'no' );
+
+	if ( 'yes' !== $network_delete_data ) {
+		return;
+	}
+}
+
 global $wpdb;
 
-// Only remove data if the user has opted in via a plugin option (best practice).
-// For now we always clean up to be GDPR-friendly.
+// Remove plugin data only when the uninstall cleanup setting is enabled.
 $meta_keys = array(
 	'_tsds_service_type',
 	'_tsds_weekly_schedule',
@@ -41,4 +50,17 @@ foreach ( $order_meta_keys as $meta_key ) {
 		array( 'meta_key' => $meta_key ), // phpcs:ignore WordPress.DB.SlowDBQuery
 		array( '%s' )
 	);
+}
+
+// Remove plugin settings options.
+$option_keys = array(
+	'tsds_date_format',
+	'tsds_date_label',
+	'tsds_date_error',
+	'tsds_delete_data_on_uninstall',
+);
+
+foreach ( $option_keys as $option_key ) {
+	delete_option( $option_key );
+	delete_site_option( $option_key );
 }

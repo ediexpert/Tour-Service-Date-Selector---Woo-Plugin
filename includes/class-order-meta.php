@@ -52,6 +52,12 @@ class Order_Meta {
 			10,
 			2
 		);
+
+		// Hide raw booking meta keys in admin item meta list.
+		add_filter(
+			'woocommerce_hidden_order_itemmeta',
+			array( $this, 'hide_raw_order_item_meta' )
+		);
 	}
 
 	/**
@@ -97,8 +103,11 @@ class Order_Meta {
 		\WC_Order_Item_Product $item,
 		\WC_Product|false $product
 	): void {
+		unset( $item_id, $product );
+
 		$date = $item->get_meta( self::ORDER_DATE_KEY );
 		$time = $item->get_meta( self::ORDER_TIME_KEY );
+		$date_label = Helper::get_date_label();
 
 		$display_date = $date
 			? Helper::format_booking_date_for_display(
@@ -116,7 +125,7 @@ class Order_Meta {
 		if ( $display_date ) {
 			printf(
 				'<p class="tsds-order-meta__row"><strong>%s:</strong> %s</p>',
-				esc_html__( 'Booking Date', 'tour-service-date-selector' ),
+				esc_html( $date_label ),
 				esc_html( $display_date )
 			);
 		}
@@ -140,8 +149,20 @@ class Order_Meta {
 	 * @return \stdClass[]
 	 */
 	public function format_order_item_meta( array $formatted_meta, \WC_Order_Item_Product $item ): array {
+		// Remove raw meta rows so only curated labels/values are shown to customers.
+		foreach ( $formatted_meta as $index => $meta ) {
+			if ( ! isset( $meta->key ) ) {
+				continue;
+			}
+
+			if ( self::ORDER_DATE_KEY === $meta->key ) {
+				unset( $formatted_meta[ $index ] );
+			}
+		}
+
 		$date = $item->get_meta( self::ORDER_DATE_KEY );
 		$time = $item->get_meta( self::ORDER_TIME_KEY );
+		$date_label = Helper::get_date_label();
 
 		$display_date = $date
 			? Helper::format_booking_date_for_display(
@@ -153,9 +174,9 @@ class Order_Meta {
 		if ( $display_date ) {
 			$meta          = new \stdClass();
 			$meta->key     = self::ORDER_DATE_KEY;
-			$meta->label   = __( 'Booking Date', 'tour-service-date-selector' );
+			$meta->label   = $date_label;
 			$meta->value   = esc_html( $display_date );
-			$meta->display_key   = __( 'Booking Date', 'tour-service-date-selector' );
+			$meta->display_key   = $date_label;
 			$meta->display_value = esc_html( $display_date );
 			$formatted_meta[]    = $meta;
 		}
@@ -170,6 +191,24 @@ class Order_Meta {
 			$formatted_meta[]    = $meta;
 		}
 
-		return $formatted_meta;
+		return array_values( $formatted_meta );
+	}
+
+	/**
+	 * Hide raw booking meta keys in WooCommerce admin order item meta display.
+	 *
+	 * @param string[] $hidden_meta_keys Existing hidden order item meta keys.
+	 * @return string[]
+	 */
+	public function hide_raw_order_item_meta( array $hidden_meta_keys ): array {
+		if ( ! in_array( self::ORDER_DATE_KEY, $hidden_meta_keys, true ) ) {
+			$hidden_meta_keys[] = self::ORDER_DATE_KEY;
+		}
+
+		if ( ! in_array( self::ORDER_TIME_KEY, $hidden_meta_keys, true ) ) {
+			$hidden_meta_keys[] = self::ORDER_TIME_KEY;
+		}
+
+		return $hidden_meta_keys;
 	}
 }

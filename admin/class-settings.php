@@ -62,6 +62,16 @@ class Settings {
 			)
 		);
 
+		register_setting(
+			'tsds_settings_group',
+			Helper::OPTION_DELETE_DATA_ON_UNINSTALL,
+			array(
+				'type'              => 'string',
+				'sanitize_callback' => array( Helper::class, 'sanitize_yes_no' ),
+				'default'           => Helper::DEFAULT_DELETE_DATA_ON_UNINSTALL,
+			)
+		);
+
 		add_settings_section(
 			'tsds_general_section',
 			__( 'General Settings', 'tour-service-date-selector' ),
@@ -91,6 +101,14 @@ class Settings {
 			'tsds_date_error_field',
 			__( 'Date Validation Error', 'tour-service-date-selector' ),
 			array( $this, 'render_date_error_field' ),
+			'tsds-settings',
+			'tsds_general_section'
+		);
+
+		add_settings_field(
+			'tsds_delete_data_on_uninstall_field',
+			__( 'Data Cleanup on Uninstall', 'tour-service-date-selector' ),
+			array( $this, 'render_delete_data_on_uninstall_field' ),
 			'tsds-settings',
 			'tsds_general_section'
 		);
@@ -178,6 +196,29 @@ class Settings {
 				'<strong>' . esc_html( Helper::DEFAULT_DATE_ERROR ) . '</strong>'
 			);
 			?>
+		</p>
+		<?php
+	}
+
+	/**
+	 * Render uninstall data cleanup field.
+	 */
+	public function render_delete_data_on_uninstall_field(): void {
+		$enabled = Helper::should_delete_data_on_uninstall();
+		?>
+		<input type="hidden" name="<?php echo esc_attr( Helper::OPTION_DELETE_DATA_ON_UNINSTALL ); ?>" value="no" />
+		<label for="<?php echo esc_attr( Helper::OPTION_DELETE_DATA_ON_UNINSTALL ); ?>">
+			<input
+				type="checkbox"
+				id="<?php echo esc_attr( Helper::OPTION_DELETE_DATA_ON_UNINSTALL ); ?>"
+				name="<?php echo esc_attr( Helper::OPTION_DELETE_DATA_ON_UNINSTALL ); ?>"
+				value="yes"
+				<?php checked( $enabled ); ?>
+			/>
+			<?php esc_html_e( 'Delete plugin data when uninstalling this plugin.', 'tour-service-date-selector' ); ?>
+		</label>
+		<p class="description">
+			<?php esc_html_e( 'When enabled, plugin settings, product booking configuration, and booking order item meta will be permanently removed on uninstall.', 'tour-service-date-selector' ); ?>
 		</p>
 		<?php
 	}
