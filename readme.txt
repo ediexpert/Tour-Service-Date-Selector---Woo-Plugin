@@ -1,18 +1,18 @@
-=== Tour Service Date Selector ===
-Contributors:      yourname
-Tags:              woocommerce, booking, tour, date, time, theme-park
-Requires at least: 6.0
-Tested up to:      6.7
-Requires PHP:      8.0
+=== INTS Tour Service Date Selector ===
+Contributors:      imbajwa
+Tags:              woocommerce, booking, tour, date, time
+Requires at least: 5.8
+Tested up to:      7.0
+Requires PHP:      7.4
 Stable tag:        1.0.0
-License:           GPL-2.0-or-later
+License:           GPL v2 or later
 License URI:       https://www.gnu.org/licenses/gpl-2.0.html
 
 Adds service booking date and time selection to WooCommerce products for tour operators and theme parks.
 
 == Description ==
 
-Tour Service Date Selector adds a flexible booking date and time picker to any WooCommerce simple or variable product without requiring categories, tags, or third-party option plugins.
+INTS Tour Service Date Selector adds a flexible booking date and time picker to any WooCommerce simple or variable product without requiring categories, tags, or third-party option plugins.
 
 **Service Types**
 
@@ -42,7 +42,7 @@ Selected date and time appear in:
 
 == Installation ==
 
-1. Upload the `tour-service-date-selector` folder to `/wp-content/plugins/`.
+1. Upload the `ints-tour-service-date-selector` folder to `/wp-content/plugins/`.
 2. Activate the plugin through **Plugins → Installed Plugins**.
 3. Edit any product, open the **Tour Service Settings** tab, and choose a Service Type.
 
@@ -71,6 +71,14 @@ Yes. WooCommerce High Performance Order Storage (custom order tables) compatibil
 3. Date and time selector with time-slot dropdown.
 4. Booking details displayed in the cart.
 5. Booking details in the admin order screen.
+
+== Third-Party Libraries ==
+
+This plugin bundles the following third-party library locally (no external/CDN requests are made):
+
+* Flatpickr 4.6.13 — lightweight date/time picker. License: MIT.
+  Included as `assets/vendor/flatpickr/flatpickr.min.js` and `assets/vendor/flatpickr/flatpickr.min.css`.
+  Unminified source is available upstream at https://github.com/flatpickr/flatpickr/tree/v4.6.13 (npm: flatpickr@4.6.13).
 
 == Changelog ==
 

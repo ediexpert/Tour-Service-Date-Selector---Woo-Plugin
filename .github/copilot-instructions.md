@@ -1,4 +1,4 @@
-# Copilot Instructions for Tour Service Date Selector
+# Copilot Instructions for INTS Tour Service Date Selector
 
 ## Context
 

@@ -2,12 +2,12 @@
 /**
  * Main Plugin class.
  *
- * @package TSDS
+ * @package INTSDS
  */
 
 declare( strict_types=1 );
 
-namespace TSDS;
+namespace INTSDS;
 
 defined( 'ABSPATH' ) || exit;
 
@@ -45,8 +45,8 @@ final class Plugin {
 	 * Initialise all subsystems.
 	 */
 	private function init(): void {
-		// Load text domain.
-		add_action( 'init', array( $this, 'load_textdomain' ) );
+		// Translations for plugins hosted on WordPress.org are loaded automatically
+		// since WordPress 4.6; no manual load_plugin_textdomain() call is needed.
 
 		// Admin.
 		if ( is_admin() ) {
@@ -72,16 +72,5 @@ final class Plugin {
 
 		// Compatibility declarations.
 		( new Compatibility() )->register();
-	}
-
-	/**
-	 * Load plugin text domain.
-	 */
-	public function load_textdomain(): void {
-		load_plugin_textdomain(
-			'tour-service-date-selector',
-			false,
-			dirname( TSDS_PLUGIN_BASENAME ) . '/languages'
-		);
 	}
 }

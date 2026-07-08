@@ -2,16 +2,16 @@
 /**
  * Admin Product Tab class.
  *
- * @package TSDS\Admin
+ * @package INTSDS\Admin
  */
 
 declare( strict_types=1 );
 
-namespace TSDS\Admin;
+namespace INTSDS\Admin;
 
 defined( 'ABSPATH' ) || exit;
 
-use TSDS\Helper;
+use INTSDS\Helper;
 
 /**
  * Class Product_Tab
@@ -34,9 +34,9 @@ class Product_Tab {
 	 * @return array<string,array<string,mixed>>
 	 */
 	public function add_tab( array $tabs ): array {
-		$tabs['tsds_tour_service'] = array(
-			'label'    => __( 'Tour Service Settings', 'tour-service-date-selector' ),
-			'target'   => 'tsds_tour_service_data',
+		$tabs['intsds_tour_service'] = array(
+			'label'    => __( 'Tour Service Settings', 'ints-tour-service-date-selector' ),
+			'target'   => 'intsds_tour_service_data',
 			'class'    => array( 'show_if_simple', 'show_if_variable' ),
 			'priority' => 60,
 		);

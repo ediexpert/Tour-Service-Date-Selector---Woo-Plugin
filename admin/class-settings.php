@@ -2,16 +2,16 @@
 /**
  * Admin Settings class.
  *
- * @package TSDS\Admin
+ * @package INTSDS\Admin
  */
 
 declare( strict_types=1 );
 
-namespace TSDS\Admin;
+namespace INTSDS\Admin;
 
 defined( 'ABSPATH' ) || exit;
 
-use TSDS\Helper;
+use INTSDS\Helper;
 
 /**
  * Class Settings
@@ -33,7 +33,7 @@ class Settings {
 	 */
 	public function register_settings(): void {
 		register_setting(
-			'tsds_settings_group',
+			'intsds_settings_group',
 			Helper::OPTION_DATE_FORMAT,
 			array(
 				'type'              => 'string',
@@ -43,7 +43,7 @@ class Settings {
 		);
 
 		register_setting(
-			'tsds_settings_group',
+			'intsds_settings_group',
 			Helper::OPTION_DATE_LABEL,
 			array(
 				'type'              => 'string',
@@ -53,7 +53,7 @@ class Settings {
 		);
 
 		register_setting(
-			'tsds_settings_group',
+			'intsds_settings_group',
 			Helper::OPTION_DATE_ERROR,
 			array(
 				'type'              => 'string',
@@ -63,7 +63,7 @@ class Settings {
 		);
 
 		register_setting(
-			'tsds_settings_group',
+			'intsds_settings_group',
 			Helper::OPTION_DELETE_DATA_ON_UNINSTALL,
 			array(
 				'type'              => 'string',
@@ -73,44 +73,44 @@ class Settings {
 		);
 
 		add_settings_section(
-			'tsds_general_section',
-			__( 'General Settings', 'tour-service-date-selector' ),
+			'intsds_general_section',
+			__( 'General Settings', 'ints-tour-service-date-selector' ),
 			function (): void {
-				echo '<p>' . esc_html__( 'Configure global booking display preferences for all products.', 'tour-service-date-selector' ) . '</p>';
+				echo '<p>' . esc_html__( 'Configure global booking display preferences for all products.', 'ints-tour-service-date-selector' ) . '</p>';
 			},
-			'tsds-settings'
+			'intsds-settings'
 		);
 
 		add_settings_field(
-			'tsds_date_format_field',
-			__( 'Date Format', 'tour-service-date-selector' ),
+			'intsds_date_format_field',
+			__( 'Date Format', 'ints-tour-service-date-selector' ),
 			array( $this, 'render_date_format_field' ),
-			'tsds-settings',
-			'tsds_general_section'
+			'intsds-settings',
+			'intsds_general_section'
 		);
 
 		add_settings_field(
-			'tsds_date_label_field',
-			__( 'Date Field Label', 'tour-service-date-selector' ),
+			'intsds_date_label_field',
+			__( 'Date Field Label', 'ints-tour-service-date-selector' ),
 			array( $this, 'render_date_label_field' ),
-			'tsds-settings',
-			'tsds_general_section'
+			'intsds-settings',
+			'intsds_general_section'
 		);
 
 		add_settings_field(
-			'tsds_date_error_field',
-			__( 'Date Validation Error', 'tour-service-date-selector' ),
+			'intsds_date_error_field',
+			__( 'Date Validation Error', 'ints-tour-service-date-selector' ),
 			array( $this, 'render_date_error_field' ),
-			'tsds-settings',
-			'tsds_general_section'
+			'intsds-settings',
+			'intsds_general_section'
 		);
 
 		add_settings_field(
-			'tsds_delete_data_on_uninstall_field',
-			__( 'Data Cleanup on Uninstall', 'tour-service-date-selector' ),
+			'intsds_delete_data_on_uninstall_field',
+			__( 'Data Cleanup on Uninstall', 'ints-tour-service-date-selector' ),
 			array( $this, 'render_delete_data_on_uninstall_field' ),
-			'tsds-settings',
-			'tsds_general_section'
+			'intsds-settings',
+			'intsds_general_section'
 		);
 	}
 
@@ -120,10 +120,10 @@ class Settings {
 	public function register_menu(): void {
 		add_submenu_page(
 			'woocommerce',
-			__( 'Tour Service Settings', 'tour-service-date-selector' ),
-			__( 'Tour Service Settings', 'tour-service-date-selector' ),
+			__( 'Tour Service Settings', 'ints-tour-service-date-selector' ),
+			__( 'Tour Service Settings', 'ints-tour-service-date-selector' ),
 			'manage_woocommerce',
-			'tsds-settings',
+			'intsds-settings',
 			array( $this, 'render_settings_page' )
 		);
 	}
@@ -145,7 +145,7 @@ class Settings {
 			<?php endforeach; ?>
 		</select>
 		<p class="description">
-			<?php esc_html_e( 'This format is applied to booking dates across all products, cart, checkout, emails, and order details.', 'tour-service-date-selector' ); ?>
+			<?php esc_html_e( 'This format is applied to booking dates across all products, cart, checkout, emails, and order details.', 'ints-tour-service-date-selector' ); ?>
 		</p>
 		<?php
 	}
@@ -167,7 +167,7 @@ class Settings {
 			<?php
 			printf(
 				/* translators: %s: default label value */
-				esc_html__( 'Label shown above the date picker on the product page. Default: %s', 'tour-service-date-selector' ),
+				esc_html__( 'Label shown above the date picker on the product page. Default: %s', 'ints-tour-service-date-selector' ),
 				'<strong>' . esc_html( Helper::DEFAULT_DATE_LABEL ) . '</strong>'
 			);
 			?>
@@ -192,7 +192,7 @@ class Settings {
 			<?php
 			printf(
 				/* translators: %s: default error message */
-				esc_html__( 'Validation error shown when customer tries to add to cart without selecting a date. Default: %s', 'tour-service-date-selector' ),
+				esc_html__( 'Validation error shown when customer tries to add to cart without selecting a date. Default: %s', 'ints-tour-service-date-selector' ),
 				'<strong>' . esc_html( Helper::DEFAULT_DATE_ERROR ) . '</strong>'
 			);
 			?>
@@ -215,10 +215,10 @@ class Settings {
 				value="yes"
 				<?php checked( $enabled ); ?>
 			/>
-			<?php esc_html_e( 'Delete plugin data when uninstalling this plugin.', 'tour-service-date-selector' ); ?>
+			<?php esc_html_e( 'Delete plugin data when uninstalling this plugin.', 'ints-tour-service-date-selector' ); ?>
 		</label>
 		<p class="description">
-			<?php esc_html_e( 'When enabled, plugin settings, product booking configuration, and booking order item meta will be permanently removed on uninstall.', 'tour-service-date-selector' ); ?>
+			<?php esc_html_e( 'When enabled, plugin settings, product booking configuration, and booking order item meta will be permanently removed on uninstall.', 'ints-tour-service-date-selector' ); ?>
 		</p>
 		<?php
 	}
@@ -232,11 +232,11 @@ class Settings {
 		}
 		?>
 		<div class="wrap">
-			<h1><?php esc_html_e( 'Tour Service Date Selector Settings', 'tour-service-date-selector' ); ?></h1>
+			<h1><?php esc_html_e( 'INTS Tour Service Date Selector Settings', 'ints-tour-service-date-selector' ); ?></h1>
 			<form action="options.php" method="post">
 				<?php
-				settings_fields( 'tsds_settings_group' );
-				do_settings_sections( 'tsds-settings' );
+				settings_fields( 'intsds_settings_group' );
+				do_settings_sections( 'intsds-settings' );
 				submit_button();
 				?>
 			</form>

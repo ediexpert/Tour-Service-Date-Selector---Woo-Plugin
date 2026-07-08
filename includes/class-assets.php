@@ -2,12 +2,12 @@
 /**
  * Assets class.
  *
- * @package TSDS
+ * @package INTSDS
  */
 
 declare( strict_types=1 );
 
-namespace TSDS;
+namespace INTSDS;
 
 defined( 'ABSPATH' ) || exit;
 
@@ -45,26 +45,26 @@ class Assets {
 			return;
 		}
 
-		// Flatpickr CSS.
+		// Flatpickr CSS (bundled locally).
 		wp_enqueue_style(
-			'flatpickr',
-			'https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css',
+			'intsds-flatpickr',
+			INTSDS_PLUGIN_URL . 'assets/vendor/flatpickr/flatpickr.min.css',
 			array(),
 			'4.6.13'
 		);
 
 		// Plugin frontend CSS.
 		wp_enqueue_style(
-			'tsds-frontend',
-			TSDS_PLUGIN_URL . 'assets/css/frontend.css',
-			array( 'flatpickr' ),
-			TSDS_VERSION
+			'intsds-frontend',
+			INTSDS_PLUGIN_URL . 'assets/css/frontend.css',
+			array( 'intsds-flatpickr' ),
+			INTSDS_VERSION
 		);
 
-		// Flatpickr JS.
+		// Flatpickr JS (bundled locally).
 		wp_enqueue_script(
-			'flatpickr',
-			'https://cdn.jsdelivr.net/npm/flatpickr',
+			'intsds-flatpickr',
+			INTSDS_PLUGIN_URL . 'assets/vendor/flatpickr/flatpickr.min.js',
 			array(),
 			'4.6.13',
 			true
@@ -72,17 +72,17 @@ class Assets {
 
 		// Plugin frontend JS.
 		wp_enqueue_script(
-			'tsds-frontend',
-			TSDS_PLUGIN_URL . 'assets/js/frontend.js',
-			array( 'flatpickr', 'jquery' ),
-			TSDS_VERSION,
+			'intsds-frontend',
+			INTSDS_PLUGIN_URL . 'assets/js/frontend.js',
+			array( 'intsds-flatpickr', 'jquery' ),
+			INTSDS_VERSION,
 			true
 		);
 
 		// Localise script data.
 		wp_localize_script(
-			'tsds-frontend',
-			'tsdsData',
+			'intsds-frontend',
+			'intsdsData',
 			$this->get_frontend_script_data( $product )
 		);
 	}
@@ -105,18 +105,18 @@ class Assets {
 			'displayDateFormat' => Helper::get_date_format(),
 			'schedule'        => Helper::schedule_for_js( $schedule ),
 			'disabledWeekdays'=> Helper::disabled_weekday_indices( $schedule ),
-			'nonce'           => wp_create_nonce( 'tsds_add_to_cart' ),
+			'nonce'           => wp_create_nonce( 'intsds_add_to_cart' ),
 			'i18n'            => array(
 				'selectDate'       => Helper::get_date_error(),
-				'selectDateTime'   => __( 'Please select a date and time.', 'tour-service-date-selector' ),
-				'selectTime'       => __( 'Please select a time.', 'tour-service-date-selector' ),
-				'invalidDate'      => __( 'The selected date is not available.', 'tour-service-date-selector' ),
-				'invalidTime'      => __( 'The selected time is not available for this date.', 'tour-service-date-selector' ),
+				'selectDateTime'   => __( 'Please select a date and time.', 'ints-tour-service-date-selector' ),
+				'selectTime'       => __( 'Please select a time.', 'ints-tour-service-date-selector' ),
+				'invalidDate'      => __( 'The selected date is not available.', 'ints-tour-service-date-selector' ),
+				'invalidTime'      => __( 'The selected time is not available for this date.', 'ints-tour-service-date-selector' ),
 				'dateLabel'        => Helper::get_date_label(),
-				'timeLabel'        => __( 'Select Time', 'tour-service-date-selector' ),
-				'selectedDate'     => __( 'Selected Date:', 'tour-service-date-selector' ),
-				'openBooking'      => __( 'Choose date and time', 'tour-service-date-selector' ),
-				'closeBooking'     => __( 'Hide date and time', 'tour-service-date-selector' ),
+				'timeLabel'        => __( 'Select Time', 'ints-tour-service-date-selector' ),
+				'selectedDate'     => __( 'Selected Date:', 'ints-tour-service-date-selector' ),
+				'openBooking'      => __( 'Choose date and time', 'ints-tour-service-date-selector' ),
+				'closeBooking'     => __( 'Hide date and time', 'ints-tour-service-date-selector' ),
 			),
 			// Variations data will be populated inline for variable products.
 			'variations'      => array(),
@@ -171,32 +171,32 @@ class Assets {
 		}
 
 		wp_enqueue_style(
-			'tsds-admin',
-			TSDS_PLUGIN_URL . 'assets/css/admin.css',
+			'intsds-admin',
+			INTSDS_PLUGIN_URL . 'assets/css/admin.css',
 			array( 'woocommerce_admin_styles' ),
-			TSDS_VERSION
+			INTSDS_VERSION
 		);
 
 		wp_enqueue_script(
-			'tsds-admin',
-			TSDS_PLUGIN_URL . 'assets/js/admin.js',
+			'intsds-admin',
+			INTSDS_PLUGIN_URL . 'assets/js/admin.js',
 			array( 'jquery', 'woocommerce_admin' ),
-			TSDS_VERSION,
+			INTSDS_VERSION,
 			true
 		);
 
 		wp_localize_script(
-			'tsds-admin',
-			'tsdsAdmin',
+			'intsds-admin',
+			'intsdsAdmin',
 			array(
 				'weekdays' => array(
-					__( 'Sunday', 'tour-service-date-selector' ),
-					__( 'Monday', 'tour-service-date-selector' ),
-					__( 'Tuesday', 'tour-service-date-selector' ),
-					__( 'Wednesday', 'tour-service-date-selector' ),
-					__( 'Thursday', 'tour-service-date-selector' ),
-					__( 'Friday', 'tour-service-date-selector' ),
-					__( 'Saturday', 'tour-service-date-selector' ),
+					__( 'Sunday', 'ints-tour-service-date-selector' ),
+					__( 'Monday', 'ints-tour-service-date-selector' ),
+					__( 'Tuesday', 'ints-tour-service-date-selector' ),
+					__( 'Wednesday', 'ints-tour-service-date-selector' ),
+					__( 'Thursday', 'ints-tour-service-date-selector' ),
+					__( 'Friday', 'ints-tour-service-date-selector' ),
+					__( 'Saturday', 'ints-tour-service-date-selector' ),
 				),
 			)
 		);

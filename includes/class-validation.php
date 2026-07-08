@@ -2,12 +2,12 @@
 /**
  * Validation class.
  *
- * @package TSDS
+ * @package INTSDS
  */
 
 declare( strict_types=1 );
 
-namespace TSDS;
+namespace INTSDS;
 
 defined( 'ABSPATH' ) || exit;
 
@@ -34,7 +34,7 @@ class Validation {
 		?int $variation_id,
 		string $date,
 		string $time
-	): true|\WP_Error {
+	) {
 		$service_type = Helper::get_service_type( $product_id, $variation_id );
 
 		// Open Dated: nothing to validate.
@@ -49,7 +49,7 @@ class Validation {
 		// Date required for both service types.
 		if ( empty( $clean_date ) ) {
 			return new \WP_Error(
-				'tsds_missing_date',
+				'intsds_missing_date',
 				Helper::get_date_error()
 			);
 		}
@@ -57,8 +57,8 @@ class Validation {
 		// Verify date is not in the past.
 		if ( $clean_date < gmdate( 'Y-m-d' ) ) {
 			return new \WP_Error(
-				'tsds_past_date',
-				__( 'Please select a future date for your booking.', 'tour-service-date-selector' )
+				'intsds_past_date',
+				__( 'Please select a future date for your booking.', 'ints-tour-service-date-selector' )
 			);
 		}
 
@@ -67,8 +67,8 @@ class Validation {
 		// Check weekday availability.
 		if ( ! Helper::is_date_available( $clean_date, $schedule ) ) {
 			return new \WP_Error(
-				'tsds_unavailable_date',
-				__( 'The selected date is not available. Please choose a different date.', 'tour-service-date-selector' )
+				'intsds_unavailable_date',
+				__( 'The selected date is not available. Please choose a different date.', 'ints-tour-service-date-selector' )
 			);
 		}
 
@@ -76,15 +76,15 @@ class Validation {
 		if ( Helper::SERVICE_DATE_TIME === $service_type ) {
 			if ( empty( $clean_time ) ) {
 				return new \WP_Error(
-					'tsds_missing_time',
-					__( 'Please select a booking time before adding to cart.', 'tour-service-date-selector' )
+					'intsds_missing_time',
+					__( 'Please select a booking time before adding to cart.', 'ints-tour-service-date-selector' )
 				);
 			}
 
 			if ( ! Helper::is_time_available( $clean_date, $clean_time, $schedule ) ) {
 				return new \WP_Error(
-					'tsds_unavailable_time',
-					__( 'The selected time is not available for the chosen date. Please select a valid time.', 'tour-service-date-selector' )
+					'intsds_unavailable_time',
+					__( 'The selected time is not available for the chosen date. Please select a valid time.', 'ints-tour-service-date-selector' )
 				);
 			}
 		}
@@ -100,12 +100,13 @@ class Validation {
 	 * @return array{valid:bool,date:string,time:string,error:string}
 	 */
 	public static function validate_from_post( int $product_id, ?int $variation_id ): array {
-		$date = isset( $_POST['tsds_booking_date'] ) // phpcs:ignore WordPress.Security.NonceVerification
-			? Helper::sanitize_date( wp_unslash( (string) $_POST['tsds_booking_date'] ) ) // phpcs:ignore WordPress.Security.NonceVerification
+		// Nonce is verified in Cart::validate_add_to_cart(); values are sanitized via Helper::sanitize_date()/sanitize_time().
+		$date = isset( $_POST['intsds_booking_date'] ) // phpcs:ignore WordPress.Security.NonceVerification
+			? Helper::sanitize_date( wp_unslash( (string) $_POST['intsds_booking_date'] ) ) // phpcs:ignore WordPress.Security.NonceVerification, WordPress.Security.ValidatedSanitizedInput.InputNotSanitized
 			: '';
 
-		$time = isset( $_POST['tsds_booking_time'] ) // phpcs:ignore WordPress.Security.NonceVerification
-			? Helper::sanitize_time( wp_unslash( (string) $_POST['tsds_booking_time'] ) ) // phpcs:ignore WordPress.Security.NonceVerification
+		$time = isset( $_POST['intsds_booking_time'] ) // phpcs:ignore WordPress.Security.NonceVerification
+			? Helper::sanitize_time( wp_unslash( (string) $_POST['intsds_booking_time'] ) ) // phpcs:ignore WordPress.Security.NonceVerification, WordPress.Security.ValidatedSanitizedInput.InputNotSanitized
 			: '';
 
 		$result = self::validate( $product_id, $variation_id, $date, $time );
@@ -133,7 +134,7 @@ class Validation {
 	 * @param array<string,mixed> $cart_item Cart item array.
 	 * @return true|\WP_Error
 	 */
-	public static function validate_cart_item( array $cart_item ): true|\WP_Error {
+	public static function validate_cart_item( array $cart_item ) {
 		$product_id   = (int) ( $cart_item['product_id'] ?? 0 );
 		$variation_id = (int) ( $cart_item['variation_id'] ?? 0 ) ?: null;
 		$service_type = Helper::get_service_type( $product_id, $variation_id );

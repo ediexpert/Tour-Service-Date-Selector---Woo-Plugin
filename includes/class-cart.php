@@ -2,12 +2,12 @@
 /**
  * Cart handler class.
  *
- * @package TSDS
+ * @package INTSDS
  */
 
 declare( strict_types=1 );
 
-namespace TSDS;
+namespace INTSDS;
 
 defined( 'ABSPATH' ) || exit;
 
@@ -46,18 +46,18 @@ class Cart {
 	public function validate_add_to_cart( bool $passed, int $product_id, int $quantity ): bool {
 		unset( $quantity );
 
-		$variation_id = isset( $_POST['variation_id'] ) // phpcs:ignore WordPress.Security.NonceVerification
-			? (int) wp_unslash( (string) $_POST['variation_id'] ) // phpcs:ignore WordPress.Security.NonceVerification
+		$variation_id = isset( $_POST['variation_id'] ) // phpcs:ignore WordPress.Security.NonceVerification.Recommended
+			? absint( wp_unslash( $_POST['variation_id'] ) ) // phpcs:ignore WordPress.Security.NonceVerification.Recommended
 			: 0;
 
 		$variation_id_or_null = $variation_id > 0 ? $variation_id : null;
 
-		$nonce = isset( $_POST['tsds_nonce'] ) // phpcs:ignore WordPress.Security.NonceVerification
-			? sanitize_text_field( wp_unslash( (string) $_POST['tsds_nonce'] ) ) // phpcs:ignore WordPress.Security.NonceVerification
+		$nonce = isset( $_POST['intsds_nonce'] ) // phpcs:ignore WordPress.Security.NonceVerification
+			? sanitize_text_field( wp_unslash( (string) $_POST['intsds_nonce'] ) ) // phpcs:ignore WordPress.Security.NonceVerification
 			: '';
 
 		// Verify nonce.
-		if ( '' === $nonce || ! wp_verify_nonce( $nonce, 'tsds_add_to_cart' ) ) {
+		if ( '' === $nonce || ! wp_verify_nonce( $nonce, 'intsds_add_to_cart' ) ) {
 
 			// Allow nonce bypass only for truly open-dated selection,
 			// including variation-level service type overrides.
@@ -69,7 +69,7 @@ class Cart {
 			// For other service types, require nonce.
 			// This blocks direct/scripted submissions without nonce.
 			wc_add_notice(
-				__( 'Security check failed. Please refresh the page and try again.', 'tour-service-date-selector' ),
+				__( 'Security check failed. Please refresh the page and try again.', 'ints-tour-service-date-selector' ),
 				'error'
 			);
 			return false;
@@ -105,16 +105,16 @@ class Cart {
 			return $cart_item_data;
 		}
 
-		// Nonce already verified in validate_add_to_cart; safe to read POST here.
-		// phpcs:disable WordPress.Security.NonceVerification
-		$date = isset( $_POST['tsds_booking_date'] )
-			? Helper::sanitize_date( wp_unslash( (string) $_POST['tsds_booking_date'] ) )
+		// Nonce already verified in validate_add_to_cart; values sanitized via Helper::sanitize_date()/sanitize_time().
+		// phpcs:disable WordPress.Security.NonceVerification, WordPress.Security.ValidatedSanitizedInput.InputNotSanitized
+		$date = isset( $_POST['intsds_booking_date'] )
+			? Helper::sanitize_date( wp_unslash( (string) $_POST['intsds_booking_date'] ) )
 			: '';
 
-		$time = isset( $_POST['tsds_booking_time'] )
-			? Helper::sanitize_time( wp_unslash( (string) $_POST['tsds_booking_time'] ) )
+		$time = isset( $_POST['intsds_booking_time'] )
+			? Helper::sanitize_time( wp_unslash( (string) $_POST['intsds_booking_time'] ) )
 			: '';
-		// phpcs:enable WordPress.Security.NonceVerification
+		// phpcs:enable WordPress.Security.NonceVerification, WordPress.Security.ValidatedSanitizedInput.InputNotSanitized
 
 		if ( $date ) {
 			$cart_item_data[ Helper::CART_DATE_KEY ] = $date;
@@ -125,7 +125,7 @@ class Cart {
 		}
 
 		// Unique key ensures separate cart items for different dates/times.
-		$cart_item_data['tsds_unique_key'] = md5( $product_id . $variation_id . $date . $time );
+		$cart_item_data['intsds_unique_key'] = md5( $product_id . $variation_id . $date . $time );
 
 		return $cart_item_data;
 	}
@@ -152,7 +152,7 @@ class Cart {
 
 		if ( ! empty( $cart_item[ Helper::CART_TIME_KEY ] ) ) {
 			$item_data[] = array(
-				'name'  => __( 'Time', 'tour-service-date-selector' ),
+				'name'  => __( 'Time', 'ints-tour-service-date-selector' ),
 				'value' => esc_html( $cart_item[ Helper::CART_TIME_KEY ] ),
 			);
 		}
@@ -178,7 +178,7 @@ class Cart {
 				wc_add_notice(
 					sprintf(
 						/* translators: 1: product name 2: error message */
-						__( 'Booking error for &ldquo;%1$s&rdquo;: %2$s', 'tour-service-date-selector' ),
+						__( 'Booking error for &ldquo;%1$s&rdquo;: %2$s', 'ints-tour-service-date-selector' ),
 						esc_html( $name ),
 						esc_html( $result->get_error_message() )
 					),

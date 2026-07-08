@@ -2,12 +2,12 @@
 /**
  * Order meta class.
  *
- * @package TSDS
+ * @package INTSDS
  */
 
 declare( strict_types=1 );
 
-namespace TSDS;
+namespace INTSDS;
 
 defined( 'ABSPATH' ) || exit;
 
@@ -22,8 +22,8 @@ class Order_Meta {
 	/**
 	 * Order item meta keys.
 	 */
-	private const ORDER_DATE_KEY = 'tsds_booking_date';
-	private const ORDER_TIME_KEY = 'tsds_booking_time';
+	private const ORDER_DATE_KEY = 'intsds_booking_date';
+	private const ORDER_TIME_KEY = 'intsds_booking_time';
 
 	/**
 	 * Register hooks.
@@ -120,11 +120,11 @@ class Order_Meta {
 			return;
 		}
 
-		echo '<div class="tsds-order-meta">';
+		echo '<div class="intsds-order-meta">';
 
 		if ( $display_date ) {
 			printf(
-				'<p class="tsds-order-meta__row"><strong>%s:</strong> %s</p>',
+				'<p class="intsds-order-meta__row"><strong>%s:</strong> %s</p>',
 				esc_html( $date_label ),
 				esc_html( $display_date )
 			);
@@ -132,8 +132,8 @@ class Order_Meta {
 
 		if ( $time ) {
 			printf(
-				'<p class="tsds-order-meta__row"><strong>%s:</strong> %s</p>',
-				esc_html__( 'Booking Time', 'tour-service-date-selector' ),
+				'<p class="intsds-order-meta__row"><strong>%s:</strong> %s</p>',
+				esc_html__( 'Booking Time', 'ints-tour-service-date-selector' ),
 				esc_html( $time )
 			);
 		}
@@ -184,9 +184,9 @@ class Order_Meta {
 		if ( $time ) {
 			$meta          = new \stdClass();
 			$meta->key     = self::ORDER_TIME_KEY;
-			$meta->label   = __( 'Booking Time', 'tour-service-date-selector' );
+			$meta->label   = __( 'Booking Time', 'ints-tour-service-date-selector' );
 			$meta->value   = esc_html( $time );
-			$meta->display_key   = __( 'Booking Time', 'tour-service-date-selector' );
+			$meta->display_key   = __( 'Booking Time', 'ints-tour-service-date-selector' );
 			$meta->display_value = esc_html( $time );
 			$formatted_meta[]    = $meta;
 		}

@@ -2,16 +2,16 @@
 /**
  * Frontend Display class.
  *
- * @package TSDS\Frontend
+ * @package INTSDS\Frontend
  */
 
 declare( strict_types=1 );
 
-namespace TSDS\Frontend;
+namespace INTSDS\Frontend;
 
 defined( 'ABSPATH' ) || exit;
 
-use TSDS\Helper;
+use INTSDS\Helper;
 
 /**
  * Class Display
@@ -50,7 +50,7 @@ class Display {
 		$schedule = Helper::get_schedule( $product_id );
 
 		// Load the template.
-		$template = TSDS_PLUGIN_DIR . 'templates/booking-fields.php';
+		$template = INTSDS_PLUGIN_DIR . 'templates/booking-fields.php';
 		if ( file_exists( $template ) ) {
 			include $template;
 		}

@@ -5,10 +5,10 @@
  *  - Show / hide Weekly Schedule based on Service Type dropdown
  *  - Same behaviour for variation-level fields
  *
- * @package TSDS
+ * @package INTSDS
  */
 
-/* global jQuery, tsdsAdmin */
+/* global jQuery, intsdsAdmin */
 
 ( function ( $ ) {
 	'use strict';
@@ -18,8 +18,8 @@
 	// ───────────────────────────────────────────────
 
 	function initProductPanel() {
-		const $serviceType = $( '#tsds_service_type' );
-		const $schedule    = $( '#tsds-weekly-schedule' );
+		const $serviceType = $( '#intsds_service_type' );
+		const $schedule    = $( '#intsds-weekly-schedule' );
 
 		if ( ! $serviceType.length ) {
 			return;
@@ -36,7 +36,7 @@
 		// Initial state.
 		toggleSchedule();
 
-		$serviceType.on( 'change.tsds', toggleSchedule );
+		$serviceType.on( 'change.ints', toggleSchedule );
 	}
 
 	// ───────────────────────────────────────────────
@@ -46,12 +46,12 @@
 	function initVariationPanels() {
 		// Delegate to handle variations added dynamically.
 		$( document ).on(
-			'change.tsds',
-			'.tsds-variation-service-type',
+			'change.ints',
+			'.intsds-variation-service-type',
 			function () {
 				const $select   = $( this );
-				const $row      = $select.closest( '.tsds-variation-settings' );
-				const $schedule = $row.find( '.tsds-variation-schedule' );
+				const $row      = $select.closest( '.intsds-variation-settings' );
+				const $schedule = $row.find( '.intsds-variation-schedule' );
 				const val       = $select.val();
 
 				if ( val === '' || val === 'open_dated' ) {

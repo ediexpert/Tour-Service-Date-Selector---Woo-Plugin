@@ -1,22 +1,21 @@
 <?php
 /**
- * Plugin Name:       Tour Service Date Selector
- * Plugin URI:        https://example.com/tour-service-date-selector
+ * Plugin Name:       INTS Tour Service Date Selector
  * Description:       Adds service booking capabilities (date and time selection) for tourism products and theme parks in WooCommerce.
  * Version:           1.0.0
- * Requires at least: 6.0
- * Requires PHP:      8.0
  * Author:            Imran Bajwa
- * Author URI:        https://intservicesllc.com
- * Company:           INT SERVICES LLC
- * License:           GPL-2.0-or-later
- * License URI:       https://www.gnu.org/licenses/gpl-2.0.html
- * Text Domain:       tour-service-date-selector
+ * Author URI:        https://profiles.wordpress.org/imbajwa/
+ * Text Domain:       ints-tour-service-date-selector
  * Domain Path:       /languages
- * WC requires at least: 7.0
- * WC tested up to:   9.0
+ * Requires at least: 5.8
+ * Tested up to:      7.0
+ * Requires PHP:      7.4
+ * License:           GPL v2 or later
+ * License URI:       https://www.gnu.org/licenses/gpl-2.0.html
+ * WC requires at least: 5.0
+ * WC tested up to:   9.4
  *
- * @package TSDS
+ * @package INTSDS
  */
 
 declare( strict_types=1 );
@@ -25,11 +24,11 @@ declare( strict_types=1 );
 defined( 'ABSPATH' ) || exit;
 
 // Plugin constants.
-define( 'TSDS_VERSION', '1.0.0' );
-define( 'TSDS_PLUGIN_FILE', __FILE__ );
-define( 'TSDS_PLUGIN_DIR', plugin_dir_path( __FILE__ ) );
-define( 'TSDS_PLUGIN_URL', plugin_dir_url( __FILE__ ) );
-define( 'TSDS_PLUGIN_BASENAME', plugin_basename( __FILE__ ) );
+define( 'INTSDS_VERSION', '1.0.0' );
+define( 'INTSDS_PLUGIN_FILE', __FILE__ );
+define( 'INTSDS_PLUGIN_DIR', plugin_dir_path( __FILE__ ) );
+define( 'INTSDS_PLUGIN_URL', plugin_dir_url( __FILE__ ) );
+define( 'INTSDS_PLUGIN_BASENAME', plugin_basename( __FILE__ ) );
 
 /**
  * Declare WooCommerce feature compatibility.
@@ -65,8 +64,8 @@ add_action(
 				function (): void {
 					echo '<div class="notice notice-error"><p>';
 					echo esc_html__(
-						'Tour Service Date Selector requires WooCommerce to be installed and active.',
-						'tour-service-date-selector'
+						'INTS Tour Service Date Selector requires WooCommerce to be installed and active.',
+						'ints-tour-service-date-selector'
 					);
 					echo '</p></div>';
 				}
@@ -78,11 +77,11 @@ add_action(
 		spl_autoload_register(
 			function ( string $class_name ): void {
 				// Only handle our namespace.
-				if ( strpos( $class_name, 'TSDS\\' ) !== 0 ) {
+				if ( strpos( $class_name, 'INTSDS\\' ) !== 0 ) {
 					return;
 				}
 
-				$relative = substr( $class_name, strlen( 'TSDS\\' ) );
+				$relative = substr( $class_name, strlen( 'INTSDS\\' ) );
 				$parts    = explode( '\\', $relative );
 
 				// Map namespace segments to directories.
@@ -94,9 +93,9 @@ add_action(
 				$file_name = 'class-' . strtolower( str_replace( '_', '-', array_pop( $parts ) ) ) . '.php';
 
 				if ( ! empty( $parts ) && isset( $dir_map[ $parts[0] ] ) ) {
-					$file = TSDS_PLUGIN_DIR . $dir_map[ $parts[0] ] . '/' . $file_name;
+					$file = INTSDS_PLUGIN_DIR . $dir_map[ $parts[0] ] . '/' . $file_name;
 				} else {
-					$file = TSDS_PLUGIN_DIR . 'includes/' . $file_name;
+					$file = INTSDS_PLUGIN_DIR . 'includes/' . $file_name;
 				}
 
 				if ( file_exists( $file ) ) {
@@ -106,6 +105,6 @@ add_action(
 		);
 
 		// Boot the plugin.
-		\TSDS\Plugin::instance();
+		\INTSDS\Plugin::instance();
 	}
 );

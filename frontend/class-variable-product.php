@@ -2,16 +2,16 @@
 /**
  * Frontend Variable Product class.
  *
- * @package TSDS\Frontend
+ * @package INTSDS\Frontend
  */
 
 declare( strict_types=1 );
 
-namespace TSDS\Frontend;
+namespace INTSDS\Frontend;
 
 defined( 'ABSPATH' ) || exit;
 
-use TSDS\Helper;
+use INTSDS\Helper;
 
 /**
  * Class Variable_Product

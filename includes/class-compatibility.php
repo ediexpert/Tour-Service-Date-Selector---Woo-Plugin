@@ -2,12 +2,12 @@
 /**
  * Compatibility class.
  *
- * @package TSDS
+ * @package INTSDS
  */
 
 declare( strict_types=1 );
 
-namespace TSDS;
+namespace INTSDS;
 
 defined( 'ABSPATH' ) || exit;
 
@@ -34,14 +34,14 @@ class Compatibility {
 	 * @return string[]
 	 */
 	public function plugin_row_meta( array $links, string $file ): array {
-		if ( TSDS_PLUGIN_BASENAME !== $file ) {
+		if ( INTSDS_PLUGIN_BASENAME !== $file ) {
 			return $links;
 		}
 
 		$links[] = sprintf(
 			'<a href="%s">%s</a>',
-			esc_url( 'https://example.com/docs/tour-service-date-selector' ),
-			esc_html__( 'Documentation', 'tour-service-date-selector' )
+			esc_url( 'https://example.com/docs/ints-tour-service-date-selector' ),
+			esc_html__( 'Documentation', 'ints-tour-service-date-selector' )
 		);
 
 		return $links;

@@ -2,16 +2,16 @@
 /**
  * Admin Product Save class.
  *
- * @package TSDS\Admin
+ * @package INTSDS\Admin
  */
 
 declare( strict_types=1 );
 
-namespace TSDS\Admin;
+namespace INTSDS\Admin;
 
 defined( 'ABSPATH' ) || exit;
 
-use TSDS\Helper;
+use INTSDS\Helper;
 
 /**
  * Class Product_Save
@@ -39,18 +39,18 @@ class Product_Save {
 		}
 
 		// Nonce verification.
-		if ( ! isset( $_POST['tsds_product_nonce'] ) ||
+		if ( ! isset( $_POST['intsds_product_nonce'] ) ||
 			! wp_verify_nonce(
-				sanitize_text_field( wp_unslash( $_POST['tsds_product_nonce'] ) ),
-				'tsds_save_product_' . $product_id
+				sanitize_text_field( wp_unslash( $_POST['intsds_product_nonce'] ) ),
+				'intsds_save_product_' . $product_id
 			)
 		) {
 			return;
 		}
 
 		// Service type.
-		$service_type = isset( $_POST['tsds_service_type'] )
-			? sanitize_text_field( wp_unslash( $_POST['tsds_service_type'] ) )
+		$service_type = isset( $_POST['intsds_service_type'] )
+			? sanitize_text_field( wp_unslash( $_POST['intsds_service_type'] ) )
 			: Helper::SERVICE_OPEN_DATED;
 
 		if ( ! in_array( $service_type, Helper::service_types(), true ) ) {
@@ -60,8 +60,8 @@ class Product_Save {
 		update_post_meta( $product_id, Helper::META_SERVICE_TYPE, $service_type );
 
 		// Weekly schedule.
-		$schedule_raw = isset( $_POST['tsds_schedule'] ) && is_array( $_POST['tsds_schedule'] )
-			? $_POST['tsds_schedule'] // phpcs:ignore WordPress.Security.ValidatedSanitizedInput
+		$schedule_raw = isset( $_POST['intsds_schedule'] ) && is_array( $_POST['intsds_schedule'] )
+			? $_POST['intsds_schedule'] // phpcs:ignore WordPress.Security.ValidatedSanitizedInput
 			: array();
 
 		$schedule = $this->sanitize_schedule( $schedule_raw );

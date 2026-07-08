@@ -1,15 +1,15 @@
 /**
  * Tour Service Date Selector — Frontend Styles
  *
- * All selectors are strictly prefixed with .tsds- to avoid
+ * All selectors are strictly prefixed with .intsds- to avoid
  * conflicts with Elementor, Shoptimizer, or any other theme/plugin.
  *
- * @package TSDS
+ * @package INTSDS
  */
 
 /* ─── Wrapper ─────────────────────────────────────────────────── */
 
-.tsds-booking-wrapper {
+.intsds-booking-wrapper {
 	margin: 1.25em 0;
 	padding: 0;
 	background: transparent;
@@ -22,17 +22,17 @@
 
 /* ─── Field groups ────────────────────────────────────────────── */
 
-.tsds-booking-wrapper .tsds-field-group {
+.intsds-booking-wrapper .intsds-field-group {
 	margin-bottom: 1.25em;
 }
 
-.tsds-booking-wrapper .tsds-field-group:last-child {
+.intsds-booking-wrapper .intsds-field-group:last-child {
 	margin-bottom: 0;
 }
 
 /* ─── Labels ──────────────────────────────────────────────────── */
 
-.tsds-booking-wrapper .tsds-label {
+.intsds-booking-wrapper .intsds-label {
 	display: block;
 	margin-bottom: 0.4em;
 	font-weight: 600;
@@ -41,111 +41,111 @@
 	color: inherit;
 }
 
-.tsds-booking-wrapper .tsds-required {
+.intsds-booking-wrapper .intsds-required {
 	color: #cc0000;
 	margin-left: 2px;
 }
 
 /* ─── Date input / calendar popup ─────────────────────────────── */
 
-.tsds-booking-wrapper .tsds-date-input {
+.intsds-booking-wrapper .intsds-date-input {
 	display: block;
 	width: 100%;
 	max-width: 100%;
 	padding: 0.5em 0.75em;
-	border: 1px solid var(--tsds-border, currentColor);
+	border: 1px solid var(--intsds-border, currentColor);
 	border-radius: 4px;
-	background-color: var(--tsds-input-bg, transparent);
+	background-color: var(--intsds-input-bg, transparent);
 	font: inherit;
 	color: inherit;
 	box-sizing: border-box;
 	cursor: pointer;
 }
 
-.tsds-booking-wrapper .tsds-date-input:focus {
-	outline: 2px solid var(--tsds-accent, var(--wp--preset--color--primary, #2271b1));
+.intsds-booking-wrapper .intsds-date-input:focus {
+	outline: 2px solid var(--intsds-accent, var(--wp--preset--color--primary, #2271b1));
 	outline-offset: 1px;
-	border-color: var(--tsds-accent, var(--wp--preset--color--primary, #2271b1));
+	border-color: var(--intsds-accent, var(--wp--preset--color--primary, #2271b1));
 }
 
-/* Popup calendar overrides — .tsds-calendar is added by JS in onReady.
+/* Popup calendar overrides — .intsds-calendar is added by JS in onReady.
  * Scoping by class (not DOM ancestry) means styling applies whether the
- * calendar is inside .tsds-date-field-group or appended to <body>
+ * calendar is inside .intsds-date-field-group or appended to <body>
  * (required for CommerceKit StickyAddToCart and similar drawers). */
-.tsds-calendar {
+.intsds-calendar {
 	font-family: inherit;
 	font-size: inherit;
 	line-height: inherit;
 	box-shadow: 0 14px 34px rgba( 16, 24, 40, 0.18 );
-	border: 1px solid var(--tsds-calendar-border, #d0d5dd);
+	border: 1px solid var(--intsds-calendar-border, #d0d5dd);
 	border-radius: 12px;
 	width: 307px;
 	max-width: calc( 100vw - 20px );
-	background: var(--tsds-calendar-bg, #ffffff);
-	color: var(--tsds-calendar-text, #1f2937);
+	background: var(--intsds-calendar-bg, #ffffff);
+	color: var(--intsds-calendar-text, #1f2937);
 	overflow: hidden;
 	z-index: 99999 !important;
 }
 
-.tsds-calendar::before,
-.tsds-calendar::after {
+.intsds-calendar::before,
+.intsds-calendar::after {
 	display: none;
 }
 
-.tsds-calendar .flatpickr-rContainer,
-.tsds-calendar .flatpickr-days,
-.tsds-calendar .dayContainer,
-.tsds-calendar .flatpickr-weekdays {
+.intsds-calendar .flatpickr-rContainer,
+.intsds-calendar .flatpickr-days,
+.intsds-calendar .dayContainer,
+.intsds-calendar .flatpickr-weekdays {
 	width: 100%;
 	max-width: 100%;
 }
 
-.tsds-calendar .flatpickr-months,
-.tsds-calendar .flatpickr-weekdays,
-.tsds-calendar .flatpickr-days,
-.tsds-calendar .dayContainer,
-.tsds-calendar .flatpickr-current-month,
-.tsds-calendar .flatpickr-monthDropdown-months,
-.tsds-calendar .flatpickr-weekday,
-.tsds-calendar .flatpickr-day {
+.intsds-calendar .flatpickr-months,
+.intsds-calendar .flatpickr-weekdays,
+.intsds-calendar .flatpickr-days,
+.intsds-calendar .dayContainer,
+.intsds-calendar .flatpickr-current-month,
+.intsds-calendar .flatpickr-monthDropdown-months,
+.intsds-calendar .flatpickr-weekday,
+.intsds-calendar .flatpickr-day {
 	font: inherit;
 	color: inherit;
 }
 
-.tsds-calendar .flatpickr-months {
-	background: var(--tsds-calendar-header-bg, #f8fafc);
-	border-bottom: 1px solid var(--tsds-calendar-border, #d0d5dd);
+.intsds-calendar .flatpickr-months {
+	background: var(--intsds-calendar-header-bg, #f8fafc);
+	border-bottom: 1px solid var(--intsds-calendar-border, #d0d5dd);
 }
 
-.tsds-calendar .flatpickr-current-month {
+.intsds-calendar .flatpickr-current-month {
 	font-weight: 600;
 }
 
-.tsds-calendar .flatpickr-weekdays {
-	background: var(--tsds-calendar-weekday-bg, #ffffff);
+.intsds-calendar .flatpickr-weekdays {
+	background: var(--intsds-calendar-weekday-bg, #ffffff);
 }
 
-.tsds-calendar .flatpickr-weekday {
-	color: var(--tsds-calendar-muted-text, #6b7280);
+.intsds-calendar .flatpickr-weekday {
+	color: var(--intsds-calendar-muted-text, #6b7280);
 	font-weight: 600;
 }
 
-.tsds-calendar .flatpickr-day {
+.intsds-calendar .flatpickr-day {
 	border-radius: 8px;
 }
 
-.tsds-calendar .flatpickr-day:hover {
-	background: var(--tsds-calendar-hover, #eff6ff);
-	border-color: var(--tsds-calendar-hover, #eff6ff);
+.intsds-calendar .flatpickr-day:hover {
+	background: var(--intsds-calendar-hover, #eff6ff);
+	border-color: var(--intsds-calendar-hover, #eff6ff);
 }
 
-.tsds-calendar .flatpickr-day.flatpickr-disabled,
-.tsds-calendar .flatpickr-day.flatpickr-disabled:hover,
-.tsds-calendar .flatpickr-day.disabled,
-.tsds-calendar .flatpickr-day.disabled:hover {
-	background: var(--tsds-calendar-disabled-bg, #f2f4f7);
-	border-color: var(--tsds-calendar-disabled-border, #e4e7ec);
-	color: var(--tsds-calendar-disabled-text, #667085);
+.intsds-calendar .flatpickr-day.flatpickr-disabled,
+.intsds-calendar .flatpickr-day.flatpickr-disabled:hover,
+.intsds-calendar .flatpickr-day.disabled,
+.intsds-calendar .flatpickr-day.disabled:hover {
+	background: var(--intsds-calendar-disabled-bg, #f2f4f7);
+	border-color: var(--intsds-calendar-disabled-border, #e4e7ec);
+	color: var(--intsds-calendar-disabled-text, #667085);
 	opacity: 1;
 	cursor: not-allowed;
 	text-decoration: line-through;
@@ -153,18 +153,18 @@
 	text-decoration-color: currentColor;
 }
 
-.tsds-calendar .flatpickr-day.selected,
-.tsds-calendar .flatpickr-day.selected:hover {
-	background: var(--tsds-accent, var(--wp--preset--color--primary, #2271b1));
-	border-color: var(--tsds-accent, var(--wp--preset--color--primary, #2271b1));
-	color: var(--tsds-accent-contrast, #fff);
+.intsds-calendar .flatpickr-day.selected,
+.intsds-calendar .flatpickr-day.selected:hover {
+	background: var(--intsds-accent, var(--wp--preset--color--primary, #2271b1));
+	border-color: var(--intsds-accent, var(--wp--preset--color--primary, #2271b1));
+	color: var(--intsds-accent-contrast, #fff);
 }
 
-.tsds-calendar .flatpickr-day.today {
-	border-color: var(--tsds-accent, var(--wp--preset--color--primary, #2271b1));
+.intsds-calendar .flatpickr-day.today {
+	border-color: var(--intsds-accent, var(--wp--preset--color--primary, #2271b1));
 }
 
-.tsds-booking-wrapper .tsds-selected-date {
+.intsds-booking-wrapper .intsds-selected-date {
 	margin: 0.6em 0 0;
 	font-size: 0.92em;
 	font-weight: 600;
@@ -173,14 +173,14 @@
 
 /* ─── Time select ─────────────────────────────────────────────── */
 
-.tsds-booking-wrapper .tsds-time-select {
+.intsds-booking-wrapper .intsds-time-select {
 	display: block;
 	width: 100%;
-	max-width: var(--tsds-control-max-width, 260px);
+	max-width: var(--intsds-control-max-width, 260px);
 	padding: 0.5em 0.75em;
-	border: 1px solid var(--tsds-border, currentColor);
+	border: 1px solid var(--intsds-border, currentColor);
 	border-radius: 4px;
-	background-color: var(--tsds-input-bg, transparent);
+	background-color: var(--intsds-input-bg, transparent);
 	font: inherit;
 	color: inherit;
 	appearance: auto;
@@ -188,33 +188,33 @@
 	cursor: pointer;
 }
 
-.tsds-booking-wrapper .tsds-time-select:focus {
-	outline: 2px solid var(--tsds-accent, var(--wp--preset--color--primary, #2271b1));
+.intsds-booking-wrapper .intsds-time-select:focus {
+	outline: 2px solid var(--intsds-accent, var(--wp--preset--color--primary, #2271b1));
 	outline-offset: 1px;
-	border-color: var(--tsds-accent, var(--wp--preset--color--primary, #2271b1));
+	border-color: var(--intsds-accent, var(--wp--preset--color--primary, #2271b1));
 }
 
 /* ─── Error messages ──────────────────────────────────────────── */
 
-.tsds-booking-wrapper .tsds-error {
+.intsds-booking-wrapper .intsds-error {
 	margin-top: 0.4em;
 	padding: 0.4em 0.6em;
-	color: var(--tsds-error, #b00020);
+	color: var(--intsds-error, #b00020);
 	background: rgba(176, 0, 32, 0.08);
 	border: 1px solid rgba(176, 0, 32, 0.35);
-	background: color-mix(in srgb, var(--tsds-error, #b00020) 8%, transparent);
-	border: 1px solid color-mix(in srgb, var(--tsds-error, #b00020) 35%, transparent);
+	background: color-mix(in srgb, var(--intsds-error, #b00020) 8%, transparent);
+	border: 1px solid color-mix(in srgb, var(--intsds-error, #b00020) 35%, transparent);
 	border-radius: 3px;
 	font-size: 0.875em;
 }
 
 /* ─── Order meta (admin + emails) ────────────────────────────── */
 
-.tsds-order-meta {
+.intsds-order-meta {
 	margin-top: 0.5em;
 }
 
-.tsds-order-meta .tsds-order-meta__row {
+.intsds-order-meta .intsds-order-meta__row {
 	margin: 0.2em 0;
 	font-size: 0.9em;
 }
@@ -222,40 +222,40 @@
 /* ─── Responsive ─────────────────────────────────────────────── */
 
 @media ( max-width: 480px ) {
-	.tsds-booking-wrapper {
+	.intsds-booking-wrapper {
 		padding: 0;
 	}
 
-	.tsds-booking-wrapper .tsds-date-input {
+	.intsds-booking-wrapper .intsds-date-input {
 		max-width: 100%;
 	}
 
-	.tsds-calendar {
+	.intsds-calendar {
 		width: 100% !important;
 		min-width: 0;
 	}
 
-	.tsds-calendar .flatpickr-rContainer {
+	.intsds-calendar .flatpickr-rContainer {
 		min-width: 0;
 	}
 
-	.tsds-calendar .flatpickr-months {
+	.intsds-calendar .flatpickr-months {
 		padding: 0 0.25em;
 	}
 
-	.tsds-calendar .flatpickr-prev-month,
-	.tsds-calendar .flatpickr-next-month {
+	.intsds-calendar .flatpickr-prev-month,
+	.intsds-calendar .flatpickr-next-month {
 		top: 0.1em;
 		padding: 0.2em;
 	}
 
-	.tsds-calendar .flatpickr-current-month {
+	.intsds-calendar .flatpickr-current-month {
 		font-size: 0.95em;
 		padding: 0.4em 0 0;
 	}
 
-	.tsds-calendar .flatpickr-weekday,
-	.tsds-calendar .flatpickr-day {
+	.intsds-calendar .flatpickr-weekday,
+	.intsds-calendar .flatpickr-day {
 		height: 2.2em;
 		line-height: 2.2em;
 		width: 14.2857%;
@@ -264,22 +264,22 @@
 		font-size: 0.92em;
 	}
 
-	.tsds-booking-wrapper .tsds-time-select {
+	.intsds-booking-wrapper .intsds-time-select {
 		max-width: 100%;
 	}
 }
 
 @media ( max-width: 360px ) {
-	.tsds-booking-wrapper {
+	.intsds-booking-wrapper {
 		padding: 0.85em;
 	}
 
-	.tsds-calendar .flatpickr-current-month {
+	.intsds-calendar .flatpickr-current-month {
 		font-size: 0.9em;
 	}
 
-	.tsds-calendar .flatpickr-weekday,
-	.tsds-calendar .flatpickr-day {
+	.intsds-calendar .flatpickr-weekday,
+	.intsds-calendar .flatpickr-day {
 		height: 2em;
 		line-height: 2em;
 		font-size: 0.85em;

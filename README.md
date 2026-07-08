@@ -1,10 +1,10 @@
-# Tour Service Date Selector
+# INTS Tour Service Date Selector
 
 WooCommerce-based WordPress plugin to make products bookable with date and time selection.
 
 ## Overview
 
-Tour Service Date Selector adds booking date and time fields to WooCommerce products using WordPress and WooCommerce hooks for broad compatibility with themes, builders, and third-party plugins.
+INTS Tour Service Date Selector adds booking date and time fields to WooCommerce products using WordPress and WooCommerce hooks for broad compatibility with themes, builders, and third-party plugins.
 
 This plugin supports:
 
@@ -40,7 +40,7 @@ The plugin follows WooCommerce and WordPress best practices:
 
 ## Installation
 
-1. Copy this plugin folder to `/wp-content/plugins/tour-service-date-selector`.
+1. Copy this plugin folder to `/wp-content/plugins/ints-tour-service-date-selector`.
 2. Activate the plugin in WordPress Admin under Plugins.
 3. Open a WooCommerce product and configure booking behavior in the Tour Service Settings tab.
 

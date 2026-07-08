@@ -1,14 +1,14 @@
 /**
  * Tour Service Date Selector — Admin Styles
  *
- * All selectors are strictly prefixed with .tsds- to avoid conflicts.
+ * All selectors are strictly prefixed with .intsds- to avoid conflicts.
  *
- * @package TSDS
+ * @package INTSDS
  */
 
 /* ─── Panel heading ───────────────────────────────────────────── */
 
-#woocommerce-product-data ul.product_data_tabs li.tsds_tour_service a::before {
+#woocommerce-product-data ul.product_data_tabs li.intsds_tour_service a::before {
 	content: '\f508' !important;
 	font-family: dashicons !important;
 	font-size: 16px;
@@ -19,8 +19,8 @@
 	top: -1px;
 }
 
-.tsds-admin-panel .tsds-schedule-heading,
-.tsds-variation-settings .tsds-schedule-heading {
+.intsds-admin-panel .intsds-schedule-heading,
+.intsds-variation-settings .intsds-schedule-heading {
 	padding: 12px 12px 4px;
 	margin: 0 0 4px;
 	font-size: 14px;
@@ -28,13 +28,13 @@
 	color: #23282d;
 }
 
-.tsds-variation-settings .tsds-schedule-heading {
+.intsds-variation-settings .intsds-schedule-heading {
 	font-size: 13px;
 	margin-top: 8px;
 }
 
-.tsds-admin-panel .tsds-schedule-description,
-.tsds-variation-settings .tsds-variation-description {
+.intsds-admin-panel .intsds-schedule-description,
+.intsds-variation-settings .intsds-variation-description {
 	padding: 0 12px 8px;
 	margin: 0;
 	color: #666;
@@ -43,15 +43,15 @@
 
 /* ─── Schedule table ──────────────────────────────────────────── */
 
-.tsds-admin-panel .tsds-schedule-table,
-.tsds-variation-settings .tsds-schedule-table {
+.intsds-admin-panel .intsds-schedule-table,
+.intsds-variation-settings .intsds-schedule-table {
 	margin: 0 12px 16px;
 	width: calc( 100% - 24px );
 	border-collapse: collapse;
 }
 
-.tsds-admin-panel .tsds-schedule-table th,
-.tsds-variation-settings .tsds-schedule-table th {
+.intsds-admin-panel .intsds-schedule-table th,
+.intsds-variation-settings .intsds-schedule-table th {
 	background: #f5f5f5;
 	padding: 7px 10px;
 	font-size: 12px;
@@ -60,21 +60,21 @@
 	border-bottom: 1px solid #e1e1e1;
 }
 
-.tsds-admin-panel .tsds-schedule-table td,
-.tsds-variation-settings .tsds-schedule-table td {
+.intsds-admin-panel .intsds-schedule-table td,
+.intsds-variation-settings .intsds-schedule-table td {
 	padding: 7px 10px;
 	border-bottom: 1px solid #f0f0f0;
 	vertical-align: middle;
 }
 
-.tsds-admin-panel .tsds-schedule-table .tsds-schedule-day,
-.tsds-variation-settings .tsds-schedule-table .tsds-schedule-day {
+.intsds-admin-panel .intsds-schedule-table .intsds-schedule-day,
+.intsds-variation-settings .intsds-schedule-table .intsds-schedule-day {
 	font-weight: 500;
 	width: 100px;
 }
 
-.tsds-admin-panel .tsds-schedule-table .tsds-time-input,
-.tsds-variation-settings .tsds-schedule-table .tsds-time-input {
+.intsds-admin-panel .intsds-schedule-table .intsds-time-input,
+.intsds-variation-settings .intsds-schedule-table .intsds-time-input {
 	padding: 3px 6px;
 	border: 1px solid #8c8f94;
 	border-radius: 3px;
@@ -82,14 +82,14 @@
 
 /* ─── Variation settings wrapper ─────────────────────────────── */
 
-.tsds-variation-settings {
+.intsds-variation-settings {
 	margin: 10px 0 0;
 	padding: 10px;
 	background: #fdfdfd;
 	border-top: 1px solid #e1e1e1;
 }
 
-.tsds-variation-heading {
+.intsds-variation-heading {
 	margin: 0 0 4px;
 	font-size: 13px;
 	font-weight: 600;
@@ -99,29 +99,29 @@
 /* ─── Responsive ─────────────────────────────────────────────── */
 
 @media screen and ( max-width: 782px ) {
-	.tsds-admin-panel .tsds-schedule-table thead,
-	.tsds-variation-settings .tsds-schedule-table thead {
+	.intsds-admin-panel .intsds-schedule-table thead,
+	.intsds-variation-settings .intsds-schedule-table thead {
 		display: none;
 	}
 
-	.tsds-admin-panel .tsds-schedule-table tr,
-	.tsds-variation-settings .tsds-schedule-table tr {
+	.intsds-admin-panel .intsds-schedule-table tr,
+	.intsds-variation-settings .intsds-schedule-table tr {
 		display: block;
 		margin-bottom: 8px;
 		border: 1px solid #e1e1e1;
 		border-radius: 3px;
 	}
 
-	.tsds-admin-panel .tsds-schedule-table td,
-	.tsds-variation-settings .tsds-schedule-table td {
+	.intsds-admin-panel .intsds-schedule-table td,
+	.intsds-variation-settings .intsds-schedule-table td {
 		display: block;
 		text-align: right;
 		border: none;
 		border-bottom: 1px solid #f0f0f0;
 	}
 
-	.tsds-admin-panel .tsds-schedule-table td::before,
-	.tsds-variation-settings .tsds-schedule-table td::before {
+	.intsds-admin-panel .intsds-schedule-table td::before,
+	.intsds-variation-settings .intsds-schedule-table td::before {
 		content: attr( data-label );
 		float: left;
 		font-weight: 600;

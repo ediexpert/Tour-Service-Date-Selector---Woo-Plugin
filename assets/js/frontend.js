@@ -1,34 +1,34 @@
 /**
  * Tour Service Date Selector — Frontend JavaScript
  *
- * Namespace: window.TSDS
+ * Namespace: window.INTSDS
  *
  * Responsibilities:
  *  - Initialise Flatpickr inline calendar on product pages
  *  - Build time slot dropdowns from schedule data
  *  - Validate fields before add-to-cart
  *  - Handle variable product variation events (found_variation, reset_data)
- *  - Be idempotent — safe to call TSDS.init() multiple times
+ *  - Be idempotent — safe to call INTSDS.init() multiple times
  *
- * @package TSDS
+ * @package INTSDS
  */
 
-/* global tsdsData, flatpickr, jQuery */
+/* global intsdsData, flatpickr, jQuery */
 
-( function ( $, tsdsData ) {
+( function ( $, intsdsData ) {
 	'use strict';
 
-	window.TSDS = window.TSDS || {};
+	window.INTSDS = window.INTSDS || {};
 
 	/**
 	 * Internal state.
 	 */
 	const state = {
 		calendars: [],       // Flatpickr instances
-		currentServiceType: tsdsData.serviceType || 'open_dated',
-		currentDateFormat: tsdsData.displayDateFormat || 'F j, Y',
-		currentSchedule:    tsdsData.schedule     || [],
-		currentDisabled:    tsdsData.disabledWeekdays || [],
+		currentServiceType: intsdsData.serviceType || 'open_dated',
+		currentDateFormat: intsdsData.displayDateFormat || 'F j, Y',
+		currentSchedule:    intsdsData.schedule     || [],
+		currentDisabled:    intsdsData.disabledWeekdays || [],
 		initialized: false,
 	};
 
@@ -40,12 +40,12 @@
 	 */
 	function getDatePlaceholder( serviceType ) {
 		if ( serviceType === 'date_time' ) {
-			return tsdsData.i18n.selectDateTime || 'Please select a date and time.';
+			return intsdsData.i18n.selectDateTime || 'Please select a date and time.';
 		}
 
 		// Use the configurable label (e.g. 'Select Date') as the placeholder,
 		// not the error message string.
-		return tsdsData.i18n.dateLabel || 'Select Date';
+		return intsdsData.i18n.dateLabel || 'Select Date';
 	}
 
 	// ───────────────────────────────────────────────
@@ -56,7 +56,7 @@
 	 * Get the schedule entry for a given Date object.
 	 *
 	 * @param {Date}   date     JS Date.
-	 * @param {Array}  schedule TSDS schedule array.
+	 * @param {Array}  schedule INTSDS schedule array.
 	 * @return {Object|null}
 	 */
 	function getDaySchedule( date, schedule ) {
@@ -94,13 +94,13 @@
 	 * @param {Date|null} date
 	 */
 	function populateTimeSelect( date ) {
-		const $selects = $( '.tsds-time-select' );
+		const $selects = $( '.intsds-time-select' );
 		if ( ! $selects.length ) {
 			return;
 		}
 
 		$selects.empty().append(
-			$( '<option>' ).val( '' ).text( tsdsData.i18n.selectTime || '— Select time —' )
+			$( '<option>' ).val( '' ).text( intsdsData.i18n.selectTime || '— Select time —' )
 		);
 
 		if ( ! date ) {
@@ -125,7 +125,7 @@
 	 * @param {string}    dateStr
 	 */
 	function updateSelectedDatePreview( dateObj, dateStr ) {
-		const $previews = $( '.tsds-selected-date' );
+		const $previews = $( '.intsds-selected-date' );
 		if ( ! $previews.length ) {
 			return;
 		}
@@ -152,7 +152,7 @@
 			formatted = formatFn( dateObj, state.currentDateFormat );
 		}
 
-		$previews.text( ( tsdsData.i18n.selectedDate || 'Selected Date:' ) + ' ' + formatted ).show();
+		$previews.text( ( intsdsData.i18n.selectedDate || 'Selected Date:' ) + ' ' + formatted ).show();
 	}
 
 	// ───────────────────────────────────────────────
@@ -172,7 +172,7 @@
 	function destroyCalendars() {
 		// Sweep all date inputs first — catches instances created outside of
 		// state.calendars (e.g. by a theme sticky/drawer clone).
-		$( '.tsds-date-input' ).each( function () {
+		$( '.intsds-date-input' ).each( function () {
 			const fp = this._flatpickr;
 			if ( fp ) {
 				try {
@@ -264,10 +264,10 @@
 					: '';
 
 				// Update all hidden booking inputs with the machine-readable value.
-				$( 'input[name="tsds_booking_date"]' ).val( ymd );
+				$( 'input[name="intsds_booking_date"]' ).val( ymd );
 
 				// Synchronize selected date to all other Flatpickr instances on the page.
-				$( '.tsds-date-input' ).each( function () {
+				$( '.intsds-date-input' ).each( function () {
 					if ( this._flatpickr && this._flatpickr !== fpInstance && typeof this._flatpickr.setDate === 'function' ) {
 						this._flatpickr.setDate( selectedDates[0] || null, false );
 					}
@@ -280,7 +280,7 @@
 				}
 
 				// Dispatch custom event for extensibility.
-				const event = new CustomEvent( 'tsdsDateChanged', {
+				const event = new CustomEvent( 'intsdsDateChanged', {
 					bubbles: true,
 					detail: { date: ymd, dateObject: selectedDates[0] },
 				} );
@@ -289,7 +289,7 @@
 			onReady: function ( _selectedDates, _dateStr, instance ) {
 				// Tag the calendar so our CSS applies even when it's on <body>.
 				if ( instance.calendarContainer ) {
-					instance.calendarContainer.classList.add( 'tsds-calendar' );
+					instance.calendarContainer.classList.add( 'intsds-calendar' );
 				}
 			},
 		} );
@@ -298,7 +298,7 @@
 			state.calendars.push( fpInstance );
 
 			// If another input has already set a date, bind it to this instance too
-			const currentVal = $( 'input[name="tsds_booking_date"]' ).val();
+			const currentVal = $( 'input[name="intsds_booking_date"]' ).val();
 			if ( currentVal ) {
 				const parts = currentVal.split( '-' );
 				if ( parts.length === 3 ) {
@@ -320,10 +320,10 @@
 		// Reset booking data first so initSingleCalendar pre-populate only fires
 		// for the drawer sync case (where the hidden input was set by a previous
 		// user selection), not on variation change where we want a clean slate.
-		$( 'input[name="tsds_booking_date"]' ).val( '' );
+		$( 'input[name="intsds_booking_date"]' ).val( '' );
 		updateSelectedDatePreview( null, '' );
 
-		$( '.tsds-date-input' ).each( function () {
+		$( '.intsds-date-input' ).each( function () {
 			initSingleCalendar( this, disabledWeekdays );
 		} );
 	}
@@ -333,23 +333,23 @@
 	// ───────────────────────────────────────────────
 
 	function showDateFields() {
-		$( '.tsds-date-field-group' ).show();
+		$( '.intsds-date-field-group' ).show();
 	}
 
 	function hideDateFields() {
-		$( '.tsds-date-field-group' ).hide();
-		$( 'input[name="tsds_booking_date"]' ).val( '' );
+		$( '.intsds-date-field-group' ).hide();
+		$( 'input[name="intsds_booking_date"]' ).val( '' );
 		updateSelectedDatePreview( null, '' );
 		destroyCalendars();
 	}
 
 	function showTimeFields() {
-		$( '.tsds-time-field-group' ).show();
+		$( '.intsds-time-field-group' ).show();
 	}
 
 	function hideTimeFields() {
-		$( '.tsds-time-field-group' ).hide();
-		const $selects = $( '.tsds-time-select' );
+		$( '.intsds-time-field-group' ).hide();
+		const $selects = $( '.intsds-time-select' );
 		if ( $selects.length ) {
 			$selects.val( '' );
 		}
@@ -359,16 +359,16 @@
 	 * Apply a service type — show/hide fields and (re)init calendar.
 	 *
 	 * @param {string} serviceType      'open_dated' | 'date_only' | 'date_time'
-	 * @param {Array}  schedule         TSDS schedule array.
+	 * @param {Array}  schedule         INTSDS schedule array.
 	 * @param {int[]}  disabledWeekdays Disabled weekday indices.
 	 */
 	function applyServiceType( serviceType, schedule, disabledWeekdays ) {
 		state.currentServiceType  = serviceType;
 		state.currentSchedule     = schedule;
 		state.currentDisabled     = disabledWeekdays;
-		state.currentDateFormat   = tsdsData.displayDateFormat || 'F j, Y';
+		state.currentDateFormat   = intsdsData.displayDateFormat || 'F j, Y';
 
-		const $wrapper = $( '.tsds-booking-wrapper' );
+		const $wrapper = $( '.intsds-booking-wrapper' );
 
 		if ( serviceType === 'open_dated' ) {
 			$wrapper.hide();
@@ -396,7 +396,7 @@
 	// ───────────────────────────────────────────────
 
 	function showError( type, message ) {
-		const className = 'tsds-' + type + '-error';
+		const className = 'intsds-' + type + '-error';
 		const $errors = $( '.' + className );
 		if ( $errors.length ) {
 			$errors.text( message ).show();
@@ -404,7 +404,7 @@
 	}
 
 	function clearError( type ) {
-		const className = 'tsds-' + type + '-error';
+		const className = 'intsds-' + type + '-error';
 		$( '.' + className ).text( '' ).hide();
 	}
 
@@ -432,12 +432,12 @@
 		clearAllErrors();
 		let valid = true;
 
-		const date = $( 'input[name="tsds_booking_date"]' ).filter( function () {
+		const date = $( 'input[name="intsds_booking_date"]' ).filter( function () {
 			return !! this.value;
 		} ).first().val() || '';
 
 		if ( ! date ) {
-			showError( 'date', tsdsData.i18n.selectDate );
+			showError( 'date', intsdsData.i18n.selectDate );
 			valid = false;
 		} else {
 			// Validate weekday.
@@ -445,18 +445,18 @@
 			const dow      = dateObj.getDay();
 			const disabled = state.currentDisabled || [];
 			if ( disabled.indexOf( dow ) !== -1 ) {
-				showError( 'date', tsdsData.i18n.invalidDate );
+				showError( 'date', intsdsData.i18n.invalidDate );
 				valid = false;
 			}
 		}
 
 		if ( serviceType === 'date_time' ) {
-			const time = $( '.tsds-time-select' ).filter( function () {
+			const time = $( '.intsds-time-select' ).filter( function () {
 				return !! this.value;
 			} ).first().val() || '';
 
 			if ( ! time ) {
-				showError( 'time', tsdsData.i18n.selectTime );
+				showError( 'time', intsdsData.i18n.selectTime );
 				valid = false;
 			} else if ( date ) {
 				// Validate time range.
@@ -464,7 +464,7 @@
 				const daySchedule = getDaySchedule( dateObj, state.currentSchedule );
 				if ( daySchedule && daySchedule.enabled ) {
 					if ( time < daySchedule.start || time > daySchedule.end ) {
-						showError( 'time', tsdsData.i18n.invalidTime );
+						showError( 'time', intsdsData.i18n.invalidTime );
 						valid = false;
 					}
 				}
@@ -485,28 +485,28 @@
 		}
 
 		// Variation found / shown.
-		$form.on( 'found_variation.tsds show_variation.tsds', function ( event, variation ) {
+		$form.on( 'found_variation.ints show_variation.ints', function ( event, variation ) {
 			const variationId = variation.variation_id;
-			const varData = ( tsdsData.variations || {} )[ variationId ];
+			const varData = ( intsdsData.variations || {} )[ variationId ];
 
 			if ( varData ) {
 				applyServiceType( varData.serviceType, varData.schedule, varData.disabledWeekdays );
 			} else {
 				// Fall back to parent settings.
 				applyServiceType(
-					tsdsData.serviceType,
-					tsdsData.schedule,
-					tsdsData.disabledWeekdays
+					intsdsData.serviceType,
+					intsdsData.schedule,
+					intsdsData.disabledWeekdays
 				);
 			}
 		} );
 
 		// Variation reset.
-		$form.on( 'reset_data.tsds', function () {
+		$form.on( 'reset_data.ints', function () {
 			applyServiceType(
-				tsdsData.serviceType,
-				tsdsData.schedule,
-				tsdsData.disabledWeekdays
+				intsdsData.serviceType,
+				intsdsData.schedule,
+				intsdsData.disabledWeekdays
 			);
 		} );
 	}
@@ -518,19 +518,19 @@
 	function bindAddToCartValidation() {
 		// Delegate to the whole field-group so any click inside opens the calendar.
 		// This covers:
-		//  - The original .tsds-date-input (pre-Flatpickr or fresh clones).
+		//  - The original .intsds-date-input (pre-Flatpickr or fresh clones).
 		//  - The visible altInput created by Flatpickr (class flatpickr-input),
 		//    whose event listeners are NOT copied when a theme clones the DOM for
 		//    a sticky/mobile drawer.
 		//  - The "change date" scenario where _flatpickr already exists but the
 		//    old code returned without opening it.
-		$( document ).on( 'click.tsds', '.tsds-date-field-group', function ( e ) {
+		$( document ).on( 'click.ints', '.intsds-date-field-group', function ( e ) {
 			// Ignore clicks that land inside the Flatpickr calendar popup itself.
 			if ( $( e.target ).closest( '.flatpickr-calendar' ).length ) {
 				return;
 			}
 
-			const originalInput = $( this ).find( '.tsds-date-input' )[0];
+			const originalInput = $( this ).find( '.intsds-date-input' )[0];
 			if ( ! originalInput ) {
 				return;
 			}
@@ -561,13 +561,13 @@
 		} );
 
 		// Propagate choice across duplicate time dropdowns
-		$( document ).on( 'change.tsds', '.tsds-time-select', function () {
-			$( '.tsds-time-select' ).val( $( this ).val() || '' );
+		$( document ).on( 'change.ints', '.intsds-time-select', function () {
+			$( '.intsds-time-select' ).val( $( this ).val() || '' );
 			clearError( 'time' );
 		} );
 
 		function isBookingUIActive() {
-			const $wrapper = $( '.tsds-booking-wrapper' );
+			const $wrapper = $( '.intsds-booking-wrapper' );
 			return $wrapper.length && $wrapper.is( ':visible' );
 		}
 
@@ -576,33 +576,33 @@
 				return;
 			}
 
-			const dateVal = $( 'input[name="tsds_booking_date"]' ).filter( function () { return !! this.value; } ).first().val() || '';
-			const timeVal = $( '.tsds-time-select' ).filter( function () { return !! this.value; } ).first().val() || '';
-			const nonceVal = ( $( 'input[name="tsds_nonce"]' ).first().val() || '' );
+			const dateVal = $( 'input[name="intsds_booking_date"]' ).filter( function () { return !! this.value; } ).first().val() || '';
+			const timeVal = $( '.intsds-time-select' ).filter( function () { return !! this.value; } ).first().val() || '';
+			const nonceVal = ( $( 'input[name="intsds_nonce"]' ).first().val() || '' );
 
 			if ( nonceVal ) {
-				let $nonce = $form.find( 'input[name="tsds_nonce"]' );
+				let $nonce = $form.find( 'input[name="intsds_nonce"]' );
 				if ( ! $nonce.length ) {
-					$nonce = $( '<input type="hidden" name="tsds_nonce" />' ).appendTo( $form );
+					$nonce = $( '<input type="hidden" name="intsds_nonce" />' ).appendTo( $form );
 				}
 				$nonce.val( nonceVal );
 			}
 
-			let $date = $form.find( 'input[name="tsds_booking_date"]' );
+			let $date = $form.find( 'input[name="intsds_booking_date"]' );
 			if ( ! $date.length ) {
-				$date = $( '<input type="hidden" name="tsds_booking_date" />' ).appendTo( $form );
+				$date = $( '<input type="hidden" name="intsds_booking_date" />' ).appendTo( $form );
 			}
 			$date.val( dateVal );
 
-			let $time = $form.find( 'input[name="tsds_booking_time"]' );
+			let $time = $form.find( 'input[name="intsds_booking_time"]' );
 			if ( ! $time.length ) {
-				$time = $( '<input type="hidden" name="tsds_booking_time" />' ).appendTo( $form );
+				$time = $( '<input type="hidden" name="intsds_booking_time" />' ).appendTo( $form );
 			}
 			$time.val( timeVal );
 		}
 
 		function scrollToFirstError() {
-			const $firstError = $( '.tsds-error:visible' ).first();
+			const $firstError = $( '.intsds-error:visible' ).first();
 			if ( $firstError.length ) {
 				$( 'html, body' ).animate(
 					{ scrollTop: $firstError.offset().top - 80 },
@@ -612,7 +612,7 @@
 		}
 
 		// Validate on button click for classic product forms/themes.
-		$( document ).on( 'click.tsds', '.single_add_to_cart_button', function ( e ) {
+		$( document ).on( 'click.ints', '.single_add_to_cart_button', function ( e ) {
 			if ( ! isBookingUIActive() ) {
 				return;
 			}
@@ -628,7 +628,7 @@
 		} );
 
 		// Validate on form submit for sticky bars / popups that bypass button click handlers.
-		$( document ).on( 'submit.tsds', 'form.cart', function ( e ) {
+		$( document ).on( 'submit.ints', 'form.cart', function ( e ) {
 			if ( ! isBookingUIActive() ) {
 				return;
 			}
@@ -644,7 +644,7 @@
 		} );
 
 		// Ensure booking payload exists for AJAX add-to-cart integrations.
-		$( document.body ).on( 'adding_to_cart.tsds', function ( _event, $button, data ) {
+		$( document.body ).on( 'adding_to_cart.ints', function ( _event, $button, data ) {
 			if ( ! isBookingUIActive() || ! data ) {
 				return;
 			}
@@ -653,9 +653,9 @@
 				return;
 			}
 
-			data.tsds_booking_date = $( 'input[name="tsds_booking_date"]' ).filter( function () { return !! this.value; } ).first().val() || '';
-			data.tsds_booking_time = $( '.tsds-time-select' ).filter( function () { return !! this.value; } ).first().val() || '';
-			data.tsds_nonce = ( $( 'input[name="tsds_nonce"]' ).first().val() || '' );
+			data.intsds_booking_date = $( 'input[name="intsds_booking_date"]' ).filter( function () { return !! this.value; } ).first().val() || '';
+			data.intsds_booking_time = $( '.intsds-time-select' ).filter( function () { return !! this.value; } ).first().val() || '';
+			data.intsds_nonce = ( $( 'input[name="intsds_nonce"]' ).first().val() || '' );
 		} );
 	}
 
@@ -666,7 +666,7 @@
 	/**
 	 * Initialise — idempotent.
 	 */
-	TSDS.init = function () {
+	INTSDS.init = function () {
 		if ( state.initialized ) {
 			return;
 		}
@@ -674,13 +674,13 @@
 
 		// Apply initial service type.
 		applyServiceType(
-			tsdsData.serviceType,
-			tsdsData.schedule,
-			tsdsData.disabledWeekdays
+			intsdsData.serviceType,
+			intsdsData.schedule,
+			intsdsData.disabledWeekdays
 		);
 
 		// Variable product events.
-		if ( tsdsData.productType === 'variable' ) {
+		if ( intsdsData.productType === 'variable' ) {
 			bindVariationEvents();
 		}
 
@@ -691,9 +691,9 @@
 	/**
 	 * Re-init (for AJAX / Quick View contexts).
 	 */
-	TSDS.reinit = function () {
+	INTSDS.reinit = function () {
 		state.initialized = false;
-		TSDS.init();
+		INTSDS.init();
 	};
 
 	// ───────────────────────────────────────────────
@@ -701,12 +701,12 @@
 	// ───────────────────────────────────────────────
 
 	$( document ).ready( function () {
-		TSDS.init();
+		INTSDS.init();
 	} );
 
 	// Re-init after WooCommerce AJAX product updates.
 	$( document ).on( 'wc_fragments_refreshed wc_cart_button_updated', function () {
-		TSDS.init();
+		INTSDS.init();
 	} );
 
-} )( jQuery, window.tsdsData || {} );
+} )( jQuery, window.intsdsData || {} );

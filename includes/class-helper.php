@@ -2,12 +2,12 @@
 /**
  * Helper utility class.
  *
- * @package TSDS
+ * @package INTSDS
  */
 
 declare( strict_types=1 );
 
-namespace TSDS;
+namespace INTSDS;
 
 defined( 'ABSPATH' ) || exit;
 
@@ -28,21 +28,21 @@ class Helper {
 	/**
 	 * Meta key constants.
 	 */
-	public const META_SERVICE_TYPE   = '_tsds_service_type';
-	public const META_SCHEDULE       = '_tsds_weekly_schedule';
-	public const CART_DATE_KEY       = '_tsds_booking_date';
-	public const CART_TIME_KEY       = '_tsds_booking_time';
-	public const OPTION_DATE_FORMAT  = 'tsds_date_format';
+	public const META_SERVICE_TYPE   = '_intsds_service_type';
+	public const META_SCHEDULE       = '_intsds_weekly_schedule';
+	public const CART_DATE_KEY       = '_intsds_booking_date';
+	public const CART_TIME_KEY       = '_intsds_booking_time';
+	public const OPTION_DATE_FORMAT  = 'intsds_date_format';
 	public const DEFAULT_DATE_FORMAT = 'F j, Y';
 
 	/**
 	 * Option keys and defaults for configurable UI labels.
 	 */
-	public const OPTION_DATE_LABEL   = 'tsds_date_label';
+	public const OPTION_DATE_LABEL   = 'intsds_date_label';
 	public const DEFAULT_DATE_LABEL  = 'Select Date';
-	public const OPTION_DATE_ERROR   = 'tsds_date_error';
+	public const OPTION_DATE_ERROR   = 'intsds_date_error';
 	public const DEFAULT_DATE_ERROR  = 'Please select a date.';
-	public const OPTION_DELETE_DATA_ON_UNINSTALL  = 'tsds_delete_data_on_uninstall';
+	public const OPTION_DELETE_DATA_ON_UNINSTALL  = 'intsds_delete_data_on_uninstall';
 	public const DEFAULT_DELETE_DATA_ON_UNINSTALL = 'no';
 
 	/**
@@ -80,9 +80,9 @@ class Helper {
 	 */
 	public static function service_type_labels(): array {
 		return array(
-			self::SERVICE_OPEN_DATED => __( 'Open Dated', 'tour-service-date-selector' ),
-			self::SERVICE_DATE_ONLY  => __( 'Just date, no time', 'tour-service-date-selector' ),
-			self::SERVICE_DATE_TIME  => __( 'Date and time', 'tour-service-date-selector' ),
+			self::SERVICE_OPEN_DATED => __( 'Open Dated', 'ints-tour-service-date-selector' ),
+			self::SERVICE_DATE_ONLY  => __( 'Just date, no time', 'ints-tour-service-date-selector' ),
+			self::SERVICE_DATE_TIME  => __( 'Date and time', 'ints-tour-service-date-selector' ),
 		);
 	}
 
@@ -93,12 +93,12 @@ class Helper {
 	 */
 	public static function date_format_labels(): array {
 		return array(
-			'F j, Y' => __( 'June 16, 2026 (F j, Y)', 'tour-service-date-selector' ),
-			'j F Y'  => __( '16 June 2026 (j F Y)', 'tour-service-date-selector' ),
-			'Y-m-d'  => __( '2026-06-16 (Y-m-d)', 'tour-service-date-selector' ),
-			'd-m-Y'  => __( '16-06-2026 (d-m-Y)', 'tour-service-date-selector' ),
-			'd/m/Y'  => __( '16/06/2026 (d/m/Y)', 'tour-service-date-selector' ),
-			'm/d/Y'  => __( '06/16/2026 (m/d/Y)', 'tour-service-date-selector' ),
+			'F j, Y' => __( 'June 16, 2026 (F j, Y)', 'ints-tour-service-date-selector' ),
+			'j F Y'  => __( '16 June 2026 (j F Y)', 'ints-tour-service-date-selector' ),
+			'Y-m-d'  => __( '2026-06-16 (Y-m-d)', 'ints-tour-service-date-selector' ),
+			'd-m-Y'  => __( '16-06-2026 (d-m-Y)', 'ints-tour-service-date-selector' ),
+			'd/m/Y'  => __( '16/06/2026 (d/m/Y)', 'ints-tour-service-date-selector' ),
+			'm/d/Y'  => __( '06/16/2026 (m/d/Y)', 'ints-tour-service-date-selector' ),
 		);
 	}
 
@@ -275,7 +275,7 @@ class Helper {
 	 * @param string $date Date string in Y-m-d format.
 	 * @return int|false
 	 */
-	public static function get_weekday_index( string $date ): int|false {
+	public static function get_weekday_index( string $date ) {
 		$ts = strtotime( $date );
 		if ( false === $ts ) {
 			return false;
