@@ -101,7 +101,7 @@ class Order_Meta {
 	public function display_order_item_meta_admin(
 		int $item_id,
 		\WC_Order_Item_Product $item,
-		\WC_Product|false $product
+		$product
 	): void {
 		unset( $item_id, $product );
 

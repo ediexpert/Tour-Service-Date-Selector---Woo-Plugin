@@ -97,6 +97,8 @@ class Assets {
 		$product_id   = $product->get_id();
 		$service_type = Helper::get_service_type( $product_id );
 		$schedule     = Helper::get_schedule( $product_id );
+		$timezone     = Helper::get_timezone_string( $product_id );
+		$cutoff       = Helper::get_cutoff( $product_id );
 
 		$data = array(
 			'productId'       => $product_id,
@@ -105,6 +107,10 @@ class Assets {
 			'displayDateFormat' => Helper::get_date_format(),
 			'schedule'        => Helper::schedule_for_js( $schedule ),
 			'disabledWeekdays'=> Helper::disabled_weekday_indices( $schedule ),
+			'timezone'          => $timezone,
+			'cutoff'            => $cutoff,
+			'cutoffLeadMinutes' => Helper::get_cutoff_lead_minutes( $product_id ),
+			'nowTz'             => Helper::now_in_timezone( $timezone ),
 			'nonce'           => wp_create_nonce( 'intsds_add_to_cart' ),
 			'i18n'            => array(
 				'selectDate'       => Helper::get_date_error(),

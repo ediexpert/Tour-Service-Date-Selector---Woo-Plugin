@@ -23,7 +23,7 @@ class Cart {
 	 */
 	public function register(): void {
 		// Add to cart validation.
-		add_filter( 'woocommerce_add_to_cart_validation', array( $this, 'validate_add_to_cart' ), 10, 3 );
+		add_filter( 'woocommerce_add_to_cart_validation', array( $this, 'validate_add_to_cart' ), 10, 4 );
 
 		// Store booking data in cart item.
 		add_filter( 'woocommerce_add_cart_item_data', array( $this, 'add_cart_item_data' ), 10, 3 );
@@ -38,36 +38,26 @@ class Cart {
 	/**
 	 * Validate booking fields on add-to-cart.
 	 *
-	 * @param bool $passed      Whether validation passed.
-	 * @param int  $product_id  Product ID.
-	 * @param int  $quantity    Quantity.
+	 * @param bool $passed       Whether validation passed.
+	 * @param int  $product_id   Product ID.
+	 * @param int  $quantity     Quantity (unused).
+	 * @param int  $variation_id Variation ID, supplied by WooCommerce.
 	 * @return bool
 	 */
-	public function validate_add_to_cart( bool $passed, int $product_id, int $quantity ): bool {
+	public function validate_add_to_cart( bool $passed, int $product_id, int $quantity, int $variation_id = 0 ): bool {
 		unset( $quantity );
 
-		$variation_id = isset( $_POST['variation_id'] ) // phpcs:ignore WordPress.Security.NonceVerification.Recommended
-			? absint( wp_unslash( $_POST['variation_id'] ) ) // phpcs:ignore WordPress.Security.NonceVerification.Recommended
-			: 0;
-
 		$variation_id_or_null = $variation_id > 0 ? $variation_id : null;
+		$service_type         = Helper::get_service_type( $product_id, $variation_id_or_null );
 
-		$nonce = isset( $_POST['intsds_nonce'] ) // phpcs:ignore WordPress.Security.NonceVerification
-			? sanitize_text_field( wp_unslash( (string) $_POST['intsds_nonce'] ) ) // phpcs:ignore WordPress.Security.NonceVerification
-			: '';
+		// Open-dated products render no booking fields and send no nonce; nothing to validate.
+		if ( Helper::SERVICE_OPEN_DATED === $service_type ) {
+			return $passed;
+		}
 
-		// Verify nonce.
-		if ( '' === $nonce || ! wp_verify_nonce( $nonce, 'intsds_add_to_cart' ) ) {
-
-			// Allow nonce bypass only for truly open-dated selection,
-			// including variation-level service type overrides.
-			$service_type = Helper::get_service_type( $product_id, $variation_id_or_null );
-			if ( Helper::SERVICE_OPEN_DATED === $service_type ) {
-				return $passed;
-			}
-
-			// For other service types, require nonce.
-			// This blocks direct/scripted submissions without nonce.
+		// Every other service type must carry a valid nonce.
+		$nonce = isset( $_POST['intsds_nonce'] ) ? sanitize_text_field( wp_unslash( $_POST['intsds_nonce'] ) ) : '';
+		if ( ! wp_verify_nonce( $nonce, 'intsds_add_to_cart' ) ) {
 			wc_add_notice(
 				__( 'Security check failed. Please refresh the page and try again.', 'ints-tour-service-date-selector' ),
 				'error'
@@ -75,10 +65,13 @@ class Cart {
 			return false;
 		}
 
-		$result = Validation::validate_from_post( $product_id, $variation_id_or_null );
+		// Nonce verified — read, sanitize, and validate the submitted booking data.
+		$date = isset( $_POST['intsds_booking_date'] ) ? sanitize_text_field( wp_unslash( $_POST['intsds_booking_date'] ) ) : '';
+		$time = isset( $_POST['intsds_booking_time'] ) ? sanitize_text_field( wp_unslash( $_POST['intsds_booking_time'] ) ) : '';
 
-		if ( ! $result['valid'] ) {
-			wc_add_notice( $result['error'], 'error' );
+		$result = Validation::validate( $product_id, $variation_id_or_null, $date, $time );
+		if ( is_wp_error( $result ) ) {
+			wc_add_notice( $result->get_error_message(), 'error' );
 			return false;
 		}
 
@@ -105,16 +98,18 @@ class Cart {
 			return $cart_item_data;
 		}
 
-		// Nonce already verified in validate_add_to_cart; values sanitized via Helper::sanitize_date()/sanitize_time().
-		// phpcs:disable WordPress.Security.NonceVerification, WordPress.Security.ValidatedSanitizedInput.InputNotSanitized
-		$date = isset( $_POST['intsds_booking_date'] )
-			? Helper::sanitize_date( wp_unslash( (string) $_POST['intsds_booking_date'] ) )
-			: '';
+		// Verify the nonce in this function before processing any submitted input.
+		$nonce = isset( $_POST['intsds_nonce'] ) ? sanitize_text_field( wp_unslash( $_POST['intsds_nonce'] ) ) : '';
+		if ( ! wp_verify_nonce( $nonce, 'intsds_add_to_cart' ) ) {
+			return $cart_item_data;
+		}
 
-		$time = isset( $_POST['intsds_booking_time'] )
-			? Helper::sanitize_time( wp_unslash( (string) $_POST['intsds_booking_time'] ) )
-			: '';
-		// phpcs:enable WordPress.Security.NonceVerification, WordPress.Security.ValidatedSanitizedInput.InputNotSanitized
+		// Sanitize early, then validate the format via the Helper.
+		$date = isset( $_POST['intsds_booking_date'] ) ? sanitize_text_field( wp_unslash( $_POST['intsds_booking_date'] ) ) : '';
+		$time = isset( $_POST['intsds_booking_time'] ) ? sanitize_text_field( wp_unslash( $_POST['intsds_booking_time'] ) ) : '';
+
+		$date = Helper::sanitize_date( $date );
+		$time = $time ? Helper::sanitize_time( $time ) : '';
 
 		if ( $date ) {
 			$cart_item_data[ Helper::CART_DATE_KEY ] = $date;

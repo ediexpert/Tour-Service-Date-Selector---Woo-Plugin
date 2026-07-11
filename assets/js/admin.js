@@ -33,10 +33,23 @@
 			}
 		}
 
+		const $cutoff     = $( '#intsds_cutoff' );
+		const $cutoffLead = $( '.intsds-cutoff-lead' );
+
+		function toggleCutoffLead() {
+			if ( $cutoff.val() === 'none' ) {
+				$cutoffLead.slideUp( 200 );
+			} else {
+				$cutoffLead.slideDown( 200 );
+			}
+		}
+
 		// Initial state.
 		toggleSchedule();
+		toggleCutoffLead();
 
 		$serviceType.on( 'change.ints', toggleSchedule );
+		$cutoff.on( 'change.ints', toggleCutoffLead );
 	}
 
 	// ───────────────────────────────────────────────

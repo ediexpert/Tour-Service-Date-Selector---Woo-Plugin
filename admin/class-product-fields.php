@@ -36,6 +36,8 @@ class Product_Fields {
 		$product_id   = (int) $post->ID;
 		$service_type = Helper::get_service_type( $product_id );
 		$schedule     = Helper::get_schedule( $product_id );
+		$timezone     = Helper::get_timezone_string( $product_id );
+		$cutoff       = Helper::get_cutoff( $product_id );
 
 		echo '<div id="intsds_tour_service_data" class="panel woocommerce_options_panel intsds-admin-panel">';
 
@@ -62,6 +64,87 @@ class Product_Fields {
 		// Weekly schedule section — shown/hidden by JS.
 		$hidden = ( Helper::SERVICE_OPEN_DATED === $service_type ) ? ' style="display:none;"' : '';
 		echo '<div id="intsds-weekly-schedule"' . $hidden . '>'; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
+
+		// Timezone + booking cutoff (product-level).
+		echo '<div class="options_group intsds-availability-group">';
+
+		echo '<p class="form-field intsds-timezone-field">';
+		echo '<label for="intsds_timezone">' . esc_html__( 'Timezone', 'ints-tour-service-date-selector' ) . '</label>';
+		echo '<select id="intsds_timezone" name="intsds_timezone" class="select short">';
+		// wp_timezone_choice() returns an escaped <option>/<optgroup> list built from the IANA database.
+		echo wp_timezone_choice( $timezone ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
+		echo '</select>';
+		echo '<span class="description">' . esc_html__( 'Timezone used to evaluate date availability and the daily cutoff.', 'ints-tour-service-date-selector' ) . '</span>';
+		echo '</p>';
+
+		woocommerce_wp_select(
+			array(
+				'id'          => 'intsds_cutoff',
+				'name'        => 'intsds_cutoff',
+				'label'       => __( 'Booking Cutoff', 'ints-tour-service-date-selector' ),
+				'value'       => $cutoff,
+				'options'     => Helper::cutoff_options(),
+				'desc_tip'    => true,
+				'description' => __( 'Choose which schedule time (Start or End) a date is measured against. The lead time below sets how far before that time booking closes.', 'ints-tour-service-date-selector' ),
+			)
+		);
+
+		// Advance-notice lead time (Days / Hours / Minutes before the reference time).
+		$lead   = Helper::get_cutoff_lead( $product_id );
+		$hidden_lead = ( Helper::CUTOFF_NONE === $cutoff ) ? ' style="display:none;"' : '';
+		echo '<div class="intsds-cutoff-lead"' . $hidden_lead . '>'; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
+
+		echo '<p class="form-field intsds-cutoff-lead__intro">';
+		esc_html_e( 'Lead time before the reference time when a date stops accepting bookings. Example: reference End Time 16:00 with 2 hours closes that day at 14:00; 3 days requires booking at least 3 days ahead.', 'ints-tour-service-date-selector' );
+		echo '</p>';
+
+		woocommerce_wp_text_input(
+			array(
+				'id'                => 'intsds_cutoff_days',
+				'name'              => 'intsds_cutoff_days',
+				'label'             => __( 'Cutoff lead — Days', 'ints-tour-service-date-selector' ),
+				'value'             => (string) $lead['days'],
+				'type'              => 'number',
+				'custom_attributes' => array(
+					'min'  => '0',
+					'step' => '1',
+				),
+			)
+		);
+
+		woocommerce_wp_text_input(
+			array(
+				'id'                => 'intsds_cutoff_hours',
+				'name'              => 'intsds_cutoff_hours',
+				'label'             => __( 'Cutoff lead — Hours', 'ints-tour-service-date-selector' ),
+				'value'             => (string) $lead['hours'],
+				'type'              => 'number',
+				'custom_attributes' => array(
+					'min'  => '0',
+					'max'  => '23',
+					'step' => '1',
+				),
+			)
+		);
+
+		woocommerce_wp_text_input(
+			array(
+				'id'                => 'intsds_cutoff_minutes',
+				'name'              => 'intsds_cutoff_minutes',
+				'label'             => __( 'Cutoff lead — Minutes', 'ints-tour-service-date-selector' ),
+				'value'             => (string) $lead['minutes'],
+				'type'              => 'number',
+				'custom_attributes' => array(
+					'min'  => '0',
+					'max'  => '59',
+					'step' => '1',
+				),
+			)
+		);
+
+		echo '</div>'; // .intsds-cutoff-lead
+
+		echo '</div>'; // .intsds-availability-group
 
 		echo '<h4 class="intsds-schedule-heading">';
 		esc_html_e( 'Weekly Schedule', 'ints-tour-service-date-selector' );

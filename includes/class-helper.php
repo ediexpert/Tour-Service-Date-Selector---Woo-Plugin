@@ -30,18 +30,34 @@ class Helper {
 	 */
 	public const META_SERVICE_TYPE   = '_intsds_service_type';
 	public const META_SCHEDULE       = '_intsds_weekly_schedule';
+	public const META_TIMEZONE       = '_intsds_timezone';
+	public const META_CUTOFF         = '_intsds_cutoff';
+	public const META_CUTOFF_DAYS    = '_intsds_cutoff_days';
+	public const META_CUTOFF_HOURS   = '_intsds_cutoff_hours';
+	public const META_CUTOFF_MINUTES = '_intsds_cutoff_minutes';
 	public const CART_DATE_KEY       = '_intsds_booking_date';
 	public const CART_TIME_KEY       = '_intsds_booking_time';
 	public const OPTION_DATE_FORMAT  = 'intsds_date_format';
 	public const DEFAULT_DATE_FORMAT = 'F j, Y';
 
 	/**
-	 * Option keys and defaults for configurable UI labels.
+	 * Booking cutoff reference options.
+	 *
+	 * Determines which schedule time (per weekday) closes bookings for the
+	 * current day, evaluated in the product timezone.
+	 */
+	public const CUTOFF_NONE  = 'none';
+	public const CUTOFF_START = 'start';
+	public const CUTOFF_END   = 'end';
+
+	/**
+	 * Option keys for configurable UI labels.
+	 *
+	 * The default label/error strings are translatable — see default_date_label()
+	 * and default_date_error() — so they are not stored as constants.
 	 */
 	public const OPTION_DATE_LABEL   = 'intsds_date_label';
-	public const DEFAULT_DATE_LABEL  = 'Select Date';
 	public const OPTION_DATE_ERROR   = 'intsds_date_error';
-	public const DEFAULT_DATE_ERROR  = 'Please select a date.';
 	public const OPTION_DELETE_DATA_ON_UNINSTALL  = 'intsds_delete_data_on_uninstall';
 	public const DEFAULT_DELETE_DATA_ON_UNINSTALL = 'no';
 
@@ -69,7 +85,6 @@ class Helper {
 		return array(
 			self::SERVICE_OPEN_DATED,
 			self::SERVICE_DATE_ONLY,
-			self::SERVICE_DATE_TIME,
 		);
 	}
 
@@ -82,7 +97,19 @@ class Helper {
 		return array(
 			self::SERVICE_OPEN_DATED => __( 'Open Dated', 'ints-tour-service-date-selector' ),
 			self::SERVICE_DATE_ONLY  => __( 'Just date, no time', 'ints-tour-service-date-selector' ),
-			self::SERVICE_DATE_TIME  => __( 'Date and time', 'ints-tour-service-date-selector' ),
+		);
+	}
+
+	/**
+	 * Return the booking cutoff options (value => label).
+	 *
+	 * @return array<string,string>
+	 */
+	public static function cutoff_options(): array {
+		return array(
+			self::CUTOFF_NONE  => __( 'No time cutoff', 'ints-tour-service-date-selector' ),
+			self::CUTOFF_START => __( 'Close the day once its Start Time passes', 'ints-tour-service-date-selector' ),
+			self::CUTOFF_END   => __( 'Close the day once its End Time passes', 'ints-tour-service-date-selector' ),
 		);
 	}
 
@@ -166,9 +193,18 @@ class Helper {
 	 * @return string
 	 */
 	public static function get_date_label(): string {
-		$label = get_option( self::OPTION_DATE_LABEL, self::DEFAULT_DATE_LABEL );
-		$clean = self::sanitize_label( (string) $label );
-		return $clean !== '' ? $clean : self::DEFAULT_DATE_LABEL;
+		$label = get_option( self::OPTION_DATE_LABEL, '' );
+		$clean = self::sanitize_label( is_string( $label ) ? $label : '' );
+		return '' !== $clean ? $clean : self::default_date_label();
+	}
+
+	/**
+	 * Translatable default for the date field label.
+	 *
+	 * @return string
+	 */
+	public static function default_date_label(): string {
+		return __( 'Select Date', 'ints-tour-service-date-selector' );
 	}
 
 	/**
@@ -177,9 +213,18 @@ class Helper {
 	 * @return string
 	 */
 	public static function get_date_error(): string {
-		$error = get_option( self::OPTION_DATE_ERROR, self::DEFAULT_DATE_ERROR );
-		$clean = self::sanitize_label( (string) $error );
-		return $clean !== '' ? $clean : self::DEFAULT_DATE_ERROR;
+		$error = get_option( self::OPTION_DATE_ERROR, '' );
+		$clean = self::sanitize_label( is_string( $error ) ? $error : '' );
+		return '' !== $clean ? $clean : self::default_date_error();
+	}
+
+	/**
+	 * Translatable default for the date validation error message.
+	 *
+	 * @return string
+	 */
+	public static function default_date_error(): string {
+		return __( 'Please select a date.', 'ints-tour-service-date-selector' );
 	}
 
 	/**
@@ -384,5 +429,174 @@ class Helper {
 			}
 		}
 		return $disabled;
+	}
+
+	/**
+	 * Get the configured timezone string for a product.
+	 *
+	 * Timezone is a product-level setting. Falls back to the site timezone.
+	 *
+	 * @param int $product_id Product ID.
+	 * @return string
+	 */
+	public static function get_timezone_string( int $product_id ): string {
+		$tz = get_post_meta( $product_id, self::META_TIMEZONE, true );
+		if ( is_string( $tz ) && '' !== $tz ) {
+			return $tz;
+		}
+		return wp_timezone_string();
+	}
+
+	/**
+	 * Get the configured booking cutoff reference for a product.
+	 *
+	 * @param int $product_id Product ID.
+	 * @return string One of CUTOFF_NONE, CUTOFF_START, CUTOFF_END.
+	 */
+	public static function get_cutoff( int $product_id ): string {
+		$cutoff = get_post_meta( $product_id, self::META_CUTOFF, true );
+		if ( in_array( $cutoff, array( self::CUTOFF_START, self::CUTOFF_END ), true ) ) {
+			return $cutoff;
+		}
+		return self::CUTOFF_NONE;
+	}
+
+	/**
+	 * Get the cutoff lead-time components (advance notice) for a product.
+	 *
+	 * Hours are clamped to 0-23 and minutes to 0-59; use days for longer spans.
+	 *
+	 * @param int $product_id Product ID.
+	 * @return array{days:int,hours:int,minutes:int}
+	 */
+	public static function get_cutoff_lead( int $product_id ): array {
+		return array(
+			'days'    => max( 0, (int) get_post_meta( $product_id, self::META_CUTOFF_DAYS, true ) ),
+			'hours'   => min( 23, max( 0, (int) get_post_meta( $product_id, self::META_CUTOFF_HOURS, true ) ) ),
+			'minutes' => min( 59, max( 0, (int) get_post_meta( $product_id, self::META_CUTOFF_MINUTES, true ) ) ),
+		);
+	}
+
+	/**
+	 * Total cutoff lead time in minutes (for the frontend calendar).
+	 *
+	 * @param int $product_id Product ID.
+	 * @return int
+	 */
+	public static function get_cutoff_lead_minutes( int $product_id ): int {
+		$lead = self::get_cutoff_lead( $product_id );
+		return $lead['days'] * 1440 + $lead['hours'] * 60 + $lead['minutes'];
+	}
+
+	/**
+	 * Resolve a timezone string to a DateTimeZone object.
+	 *
+	 * Accepts IANA identifiers (e.g. "Asia/Dubai") and the manual "UTC+X"
+	 * offsets produced by wp_timezone_choice(). Falls back to the site timezone.
+	 *
+	 * @param string $tz Timezone string.
+	 * @return \DateTimeZone
+	 */
+	public static function timezone_object( string $tz ): \DateTimeZone {
+		try {
+			if ( in_array( $tz, timezone_identifiers_list(), true ) ) {
+				return new \DateTimeZone( $tz );
+			}
+			if ( preg_match( '/^UTC([+-])(\d+)(?:\.(\d+))?$/', $tz, $m ) ) {
+				$hours   = (int) $m[2];
+				$minutes = isset( $m[3] ) ? (int) round( (float) ( '0.' . $m[3] ) * 60 ) : 0;
+				return new \DateTimeZone( sprintf( '%s%02d:%02d', $m[1], $hours, $minutes ) );
+			}
+		} catch ( \Exception $e ) {
+			// Fall through to the site timezone.
+		}
+		return wp_timezone();
+	}
+
+	/**
+	 * Current date and time-of-day in the given timezone.
+	 *
+	 * @param string                  $tz  Timezone string.
+	 * @param \DateTimeImmutable|null  $now Optional instant to evaluate (defaults to now). For testing.
+	 * @return array{date:string,minutes:int} Y-m-d date and minutes since midnight.
+	 */
+	public static function now_in_timezone( string $tz, ?\DateTimeImmutable $now = null ): array {
+		$zone = self::timezone_object( $tz );
+		$now  = $now instanceof \DateTimeImmutable ? $now->setTimezone( $zone ) : new \DateTimeImmutable( 'now', $zone );
+		return array(
+			'date'    => $now->format( 'Y-m-d' ),
+			'minutes' => (int) $now->format( 'G' ) * 60 + (int) $now->format( 'i' ),
+		);
+	}
+
+	/**
+	 * Convert an "H:i" time string to minutes since midnight.
+	 *
+	 * @param string $time Time string.
+	 * @return int|null Minutes since midnight, or null if malformed.
+	 */
+	public static function time_to_minutes( string $time ): ?int {
+		if ( preg_match( '/^(\d{2}):(\d{2})$/', $time, $m ) ) {
+			return (int) $m[1] * 60 + (int) $m[2];
+		}
+		return null;
+	}
+
+	/**
+	 * Whether a booking date is unavailable because it is in the past or has
+	 * passed the configured advance-notice cutoff, evaluated in the product
+	 * timezone.
+	 *
+	 * The cutoff deadline for a date D is:
+	 *   ( D at its Start/End time ) minus ( days, hours, minutes ).
+	 * The date is unavailable once "now" reaches that deadline.
+	 *
+	 * @param string                                                    $date     Selected date (Y-m-d).
+	 * @param array<string,array{enabled:bool,start:string,end:string}> $schedule Normalised schedule.
+	 * @param string                                                    $tz       Timezone string.
+	 * @param string                                                    $cutoff   Cutoff reference (none|start|end).
+	 * @param int                                                       $days     Lead days.
+	 * @param int                                                       $hours    Lead hours.
+	 * @param int                                                       $minutes  Lead minutes.
+	 * @param \DateTimeImmutable|null                                   $now      Optional instant to evaluate (defaults to now). For testing.
+	 * @return bool
+	 */
+	public static function is_past_cutoff( string $date, array $schedule, string $tz, string $cutoff, int $days = 0, int $hours = 0, int $minutes = 0, ?\DateTimeImmutable $now = null ): bool {
+		$zone = self::timezone_object( $tz );
+		$now  = $now instanceof \DateTimeImmutable ? $now->setTimezone( $zone ) : new \DateTimeImmutable( 'now', $zone );
+
+		// Any date before "today" in the product timezone is unavailable.
+		if ( $date < $now->format( 'Y-m-d' ) ) {
+			return true;
+		}
+
+		// No time cutoff configured — only past dates are blocked.
+		if ( self::CUTOFF_NONE !== $cutoff ) {
+			$index = self::get_weekday_index( $date );
+			if ( false === $index ) {
+				return false;
+			}
+			$day_slug = self::$weekdays[ $index ];
+			$ref      = ( self::CUTOFF_START === $cutoff )
+				? ( $schedule[ $day_slug ]['start'] ?? '' )
+				: ( $schedule[ $day_slug ]['end'] ?? '' );
+
+			if ( null !== self::time_to_minutes( (string) $ref ) ) {
+				try {
+					$ref_dt   = new \DateTimeImmutable( $date . ' ' . $ref . ':00', $zone );
+					$interval = new \DateInterval(
+						sprintf( 'P%dDT%dH%dM', max( 0, $days ), max( 0, $hours ), max( 0, $minutes ) )
+					);
+					$deadline = $ref_dt->sub( $interval );
+					if ( $now >= $deadline ) {
+						return true;
+					}
+				} catch ( \Exception $e ) {
+					return false;
+				}
+			}
+		}
+
+		return false;
 	}
 }

@@ -48,7 +48,7 @@ class Settings {
 			array(
 				'type'              => 'string',
 				'sanitize_callback' => array( Helper::class, 'sanitize_label' ),
-				'default'           => Helper::DEFAULT_DATE_LABEL,
+				'default'           => Helper::default_date_label(),
 			)
 		);
 
@@ -58,7 +58,7 @@ class Settings {
 			array(
 				'type'              => 'string',
 				'sanitize_callback' => array( Helper::class, 'sanitize_label' ),
-				'default'           => Helper::DEFAULT_DATE_ERROR,
+				'default'           => Helper::default_date_error(),
 			)
 		);
 
@@ -168,7 +168,7 @@ class Settings {
 			printf(
 				/* translators: %s: default label value */
 				esc_html__( 'Label shown above the date picker on the product page. Default: %s', 'ints-tour-service-date-selector' ),
-				'<strong>' . esc_html( Helper::DEFAULT_DATE_LABEL ) . '</strong>'
+				'<strong>' . esc_html( Helper::default_date_label() ) . '</strong>'
 			);
 			?>
 		</p>
@@ -193,7 +193,7 @@ class Settings {
 			printf(
 				/* translators: %s: default error message */
 				esc_html__( 'Validation error shown when customer tries to add to cart without selecting a date. Default: %s', 'ints-tour-service-date-selector' ),
-				'<strong>' . esc_html( Helper::DEFAULT_DATE_ERROR ) . '</strong>'
+				'<strong>' . esc_html( Helper::default_date_error() ) . '</strong>'
 			);
 			?>
 		</p>

@@ -59,6 +59,32 @@ class Product_Save {
 
 		update_post_meta( $product_id, Helper::META_SERVICE_TYPE, $service_type );
 
+		// Timezone (product-level). Accept IANA identifiers and wp_timezone_choice()
+		// manual "UTC+X" offsets; fall back to the site timezone for anything else.
+		$timezone_raw = isset( $_POST['intsds_timezone'] )
+			? sanitize_text_field( wp_unslash( $_POST['intsds_timezone'] ) )
+			: '';
+		$valid_tz     = in_array( $timezone_raw, timezone_identifiers_list(), true )
+			|| preg_match( '/^UTC([+-])(\d+)(?:\.\d+)?$/', $timezone_raw );
+		update_post_meta( $product_id, Helper::META_TIMEZONE, $valid_tz ? $timezone_raw : wp_timezone_string() );
+
+		// Booking cutoff reference.
+		$cutoff = isset( $_POST['intsds_cutoff'] )
+			? sanitize_text_field( wp_unslash( $_POST['intsds_cutoff'] ) )
+			: Helper::CUTOFF_NONE;
+		if ( ! array_key_exists( $cutoff, Helper::cutoff_options() ) ) {
+			$cutoff = Helper::CUTOFF_NONE;
+		}
+		update_post_meta( $product_id, Helper::META_CUTOFF, $cutoff );
+
+		// Cutoff lead time (advance notice). Hours 0-23, minutes 0-59, days 0+.
+		$cutoff_days    = isset( $_POST['intsds_cutoff_days'] ) ? absint( wp_unslash( $_POST['intsds_cutoff_days'] ) ) : 0;
+		$cutoff_hours   = isset( $_POST['intsds_cutoff_hours'] ) ? min( 23, absint( wp_unslash( $_POST['intsds_cutoff_hours'] ) ) ) : 0;
+		$cutoff_minutes = isset( $_POST['intsds_cutoff_minutes'] ) ? min( 59, absint( wp_unslash( $_POST['intsds_cutoff_minutes'] ) ) ) : 0;
+		update_post_meta( $product_id, Helper::META_CUTOFF_DAYS, $cutoff_days );
+		update_post_meta( $product_id, Helper::META_CUTOFF_HOURS, $cutoff_hours );
+		update_post_meta( $product_id, Helper::META_CUTOFF_MINUTES, $cutoff_minutes );
+
 		// Weekly schedule.
 		$schedule_raw = isset( $_POST['intsds_schedule'] ) && is_array( $_POST['intsds_schedule'] )
 			? $_POST['intsds_schedule'] // phpcs:ignore WordPress.Security.ValidatedSanitizedInput

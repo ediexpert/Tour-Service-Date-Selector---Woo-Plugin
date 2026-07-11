@@ -64,6 +64,104 @@
 		return schedule.find( function ( s ) { return s.index === dow; } ) || null;
 	}
 
+	// ───────────────────────────────────────────────
+	// Timezone-aware availability (product-level cutoff)
+	// ───────────────────────────────────────────────
+
+	// Wall-clock time (ms) when this script initialised. Used to advance the
+	// server-provided "now in product timezone" while the visitor stays on the page.
+	const INTSDS_LOAD_MS = Date.now();
+
+	function intsdsPad2( n ) { return ( n < 10 ? '0' : '' ) + n; }
+
+	function intsdsDateToYmd( d ) {
+		return d.getFullYear() + '-' + intsdsPad2( d.getMonth() + 1 ) + '-' + intsdsPad2( d.getDate() );
+	}
+
+	function intsdsAddDaysYmd( ymd, days ) {
+		const p = ymd.split( '-' );
+		const d = new Date( parseInt( p[0], 10 ), parseInt( p[1], 10 ) - 1, parseInt( p[2], 10 ) );
+		d.setDate( d.getDate() + days );
+		return intsdsDateToYmd( d );
+	}
+
+	function intsdsTimeToMinutes( t ) {
+		const m = /^(\d{2}):(\d{2})$/.exec( t || '' );
+		return m ? ( parseInt( m[1], 10 ) * 60 + parseInt( m[2], 10 ) ) : null;
+	}
+
+	/**
+	 * Current date/time in the product timezone, advanced by the time the
+	 * visitor has spent on the page (keeps the cutoff fresh without a reload).
+	 *
+	 * @return {Object|null} { date: 'YYYY-MM-DD', minutes: int, cutoff: string }
+	 */
+	function intsdsTzState() {
+		const info = intsdsData.nowTz;
+		if ( ! info || ! info.date ) {
+			return null;
+		}
+		let minutes = ( parseInt( info.minutes, 10 ) || 0 ) + Math.floor( ( Date.now() - INTSDS_LOAD_MS ) / 60000 );
+		let date    = info.date;
+		while ( minutes >= 1440 ) {
+			minutes -= 1440;
+			date = intsdsAddDaysYmd( date, 1 );
+		}
+		return {
+			date:        date,
+			minutes:     minutes,
+			cutoff:      intsdsData.cutoff || 'none',
+			leadMinutes: parseInt( intsdsData.cutoffLeadMinutes, 10 ) || 0,
+		};
+	}
+
+	// Absolute minutes since the Unix epoch for a wall-clock (date, minute-of-day) pair.
+	function intsdsAbsMin( ymd, minutes ) {
+		const p    = ymd.split( '-' );
+		const days = Math.round( Date.UTC( parseInt( p[0], 10 ), parseInt( p[1], 10 ) - 1, parseInt( p[2], 10 ) ) / 86400000 );
+		return days * 1440 + minutes;
+	}
+
+	/**
+	 * Whether a calendar date should be disabled: closed weekday, a past date,
+	 * or today after its cutoff — all evaluated in the product timezone.
+	 *
+	 * @param {Date}   date
+	 * @param {Array}  schedule
+	 * @param {int[]}  disabledWeekdays
+	 * @param {Object} tzState
+	 * @return {boolean}
+	 */
+	function intsdsIsDateBlocked( date, schedule, disabledWeekdays, tzState ) {
+		if ( disabledWeekdays.indexOf( date.getDay() ) !== -1 ) {
+			return true;
+		}
+		if ( tzState ) {
+			const ymd = intsdsDateToYmd( date );
+
+			// Past date in the product timezone.
+			if ( ymd < tzState.date ) {
+				return true;
+			}
+
+			// Advance-notice cutoff: closed once now >= ( date's ref time − lead ).
+			if ( tzState.cutoff && tzState.cutoff !== 'none' ) {
+				const day = getDaySchedule( date, schedule );
+				if ( day ) {
+					const refMin = intsdsTimeToMinutes( tzState.cutoff === 'start' ? day.start : day.end );
+					if ( refMin !== null ) {
+						const deadlineAbs = intsdsAbsMin( ymd, refMin ) - ( tzState.leadMinutes || 0 );
+						const nowAbs      = intsdsAbsMin( tzState.date, tzState.minutes );
+						if ( nowAbs >= deadlineAbs ) {
+							return true;
+						}
+					}
+				}
+			}
+		}
+		return false;
+	}
+
 	/**
 	 * Build H:i time slots between start and end with 15-min steps.
 	 *
@@ -242,8 +340,10 @@
 		calendarInput.value = '';
 		calendarInput.setAttribute( 'placeholder', getDatePlaceholder( state.currentServiceType ) );
 
+		const tzState = intsdsTzState();
+
 		const fpInstance = flatpickr( calendarInput, {
-			minDate: 'today',
+			minDate: tzState ? tzState.date : 'today',
 			// Display the human-readable format directly in the visible input.
 			// No altInput — one input, one source of truth, no hidden/cloned confusion.
 			dateFormat: state.currentDateFormat,
@@ -254,7 +354,7 @@
 			appendTo: document.body,
 			disable: [
 				function ( date ) {
-					return disabledWeekdays.indexOf( date.getDay() ) !== -1;
+					return intsdsIsDateBlocked( date, state.currentSchedule, disabledWeekdays, tzState );
 				},
 			],
 			onChange: function ( selectedDates, dateStr ) {
@@ -440,11 +540,10 @@
 			showError( 'date', intsdsData.i18n.selectDate );
 			valid = false;
 		} else {
-			// Validate weekday.
+			// Validate weekday, past dates, and the daily cutoff (product timezone).
 			const dateObj  = new Date( date + 'T00:00:00' );
-			const dow      = dateObj.getDay();
 			const disabled = state.currentDisabled || [];
-			if ( disabled.indexOf( dow ) !== -1 ) {
+			if ( intsdsIsDateBlocked( dateObj, state.currentSchedule, disabled, intsdsTzState() ) ) {
 				showError( 'date', intsdsData.i18n.invalidDate );
 				valid = false;
 			}

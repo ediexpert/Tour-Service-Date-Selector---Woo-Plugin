@@ -54,15 +54,10 @@ class Validation {
 			);
 		}
 
-		// Verify date is not in the past.
-		if ( $clean_date < gmdate( 'Y-m-d' ) ) {
-			return new \WP_Error(
-				'intsds_past_date',
-				__( 'Please select a future date for your booking.', 'ints-tour-service-date-selector' )
-			);
-		}
-
 		$schedule = Helper::get_schedule( $product_id, $variation_id );
+		$timezone = Helper::get_timezone_string( $product_id );
+		$cutoff   = Helper::get_cutoff( $product_id );
+		$lead     = Helper::get_cutoff_lead( $product_id );
 
 		// Check weekday availability.
 		if ( ! Helper::is_date_available( $clean_date, $schedule ) ) {
@@ -70,6 +65,16 @@ class Validation {
 				'intsds_unavailable_date',
 				__( 'The selected date is not available. Please choose a different date.', 'ints-tour-service-date-selector' )
 			);
+		}
+
+		// Reject past dates and dates whose advance-notice cutoff has passed,
+		// evaluated in the product timezone.
+		if ( Helper::is_past_cutoff( $clean_date, $schedule, $timezone, $cutoff, $lead['days'], $lead['hours'], $lead['minutes'] ) ) {
+			$now = Helper::now_in_timezone( $timezone );
+			$message = ( $clean_date < $now['date'] )
+				? __( 'Please select a future date for your booking.', 'ints-tour-service-date-selector' )
+				: __( 'Bookings for the selected date have closed. Please choose another date.', 'ints-tour-service-date-selector' );
+			return new \WP_Error( 'intsds_past_date', $message );
 		}
 
 		// Time required for date+time service type.
@@ -90,42 +95,6 @@ class Validation {
 		}
 
 		return true;
-	}
-
-	/**
-	 * Extract and validate booking data from POST data for a product.
-	 *
-	 * @param int      $product_id   Product ID.
-	 * @param int|null $variation_id Optional variation ID.
-	 * @return array{valid:bool,date:string,time:string,error:string}
-	 */
-	public static function validate_from_post( int $product_id, ?int $variation_id ): array {
-		// Nonce is verified in Cart::validate_add_to_cart(); values are sanitized via Helper::sanitize_date()/sanitize_time().
-		$date = isset( $_POST['intsds_booking_date'] ) // phpcs:ignore WordPress.Security.NonceVerification
-			? Helper::sanitize_date( wp_unslash( (string) $_POST['intsds_booking_date'] ) ) // phpcs:ignore WordPress.Security.NonceVerification, WordPress.Security.ValidatedSanitizedInput.InputNotSanitized
-			: '';
-
-		$time = isset( $_POST['intsds_booking_time'] ) // phpcs:ignore WordPress.Security.NonceVerification
-			? Helper::sanitize_time( wp_unslash( (string) $_POST['intsds_booking_time'] ) ) // phpcs:ignore WordPress.Security.NonceVerification, WordPress.Security.ValidatedSanitizedInput.InputNotSanitized
-			: '';
-
-		$result = self::validate( $product_id, $variation_id, $date, $time );
-
-		if ( is_wp_error( $result ) ) {
-			return array(
-				'valid' => false,
-				'date'  => '',
-				'time'  => '',
-				'error' => $result->get_error_message(),
-			);
-		}
-
-		return array(
-			'valid' => true,
-			'date'  => $date,
-			'time'  => $time,
-			'error' => '',
-		);
 	}
 
 	/**
